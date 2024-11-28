@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "270623556034",
+    "project_id": "lefora-ai",
+    "storage_bucket": "lefora-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270623556034:android:6f6257beec1954e31e565b",
+        "android_client_info": {
+          "package_name": "com.leafora.leafora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX6INuTGPBrY72dL3i87N4SzvuuhXjj-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
