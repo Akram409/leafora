@@ -4,6 +4,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false"
+
         tools:targetApi="eclair" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -40,7 +41,9 @@
     <application
         android:label="leafora"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
