@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
-import 'package:cached_network_image/cached_network_image.dart';  // Import the package
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:leafora/components/shared/widgets/custom_loader.dart';  // Import the package
 
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
@@ -239,7 +240,10 @@ class _HomePagesState extends State<HomePages> {
                             width: 60,
                             fit: BoxFit.cover,
                             placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                            const CustomLoader2(
+                              lottieAsset: 'assets/images/loader.json',
+                              size: 60,
+                            ),
                             errorWidget: (context, url, error) =>
                                 Icon(Icons.error),
                           ),

@@ -6,6 +6,7 @@ import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_di
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_genus_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
+import 'package:leafora/components/pages/user/my_bookmark/my_bookmark_page.dart';
 import 'package:leafora/layout/home_page.dart';
 import 'package:leafora/services/gemini_ai/gemini_plant_disease.dart';
 import 'package:leafora/services/gemini_ai/gemini_plant_genus.dart';
@@ -15,6 +16,7 @@ abstract class RoutesNames {
   static const String home = '/';
   static const String plantDisease = '/plant-disease';
   static const String plantGenus = '/plant-genus';
+  static const String myBookmark = '/myBookmark';
 }
 
 void main() async{
@@ -36,6 +38,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.home,
           page: () => const HomePage(),
+        ),
+        GetPage(
+          name: RoutesNames.myBookmark,
+          page: () => const MyBookmarkPage(),
         ),
         GetPage(
           name: RoutesNames.plantDisease,
