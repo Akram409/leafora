@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:leafora/components/pages/article/popular_article_list/popular_article_list.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_disease_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_genus_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
@@ -17,6 +18,7 @@ abstract class RoutesNames {
   static const String plantDisease = '/plant-disease';
   static const String plantGenus = '/plant-genus';
   static const String myBookmark = '/myBookmark';
+  static const String popularArticle = '/popularArticle';
 }
 
 void main() async{
@@ -42,6 +44,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.myBookmark,
           page: () => const MyBookmarkPage(),
+        ),
+        GetPage(
+          name: RoutesNames.popularArticle,
+          page: () => const PopularArticleList(),
         ),
         GetPage(
           name: RoutesNames.plantDisease,

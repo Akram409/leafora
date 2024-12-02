@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
           key: navigationKey,
           backgroundColor: Colors.transparent,
           color: Colors.greenAccent,
-          buttonBackgroundColor: Colors.blue,
+          buttonBackgroundColor: Colors.green,
           index: currentIndex,
           height: 70,
           animationCurve: Curves.easeInOut,

@@ -1,18 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:getwidget/components/search_bar/gf_search_bar.dart';
+import 'package:leafora/components/shared/utils/screen_size.dart';
+import 'package:leafora/components/shared/widgets/custom_appbar.dart';
+import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BookmarkArticles extends StatefulWidget {
-  const BookmarkArticles({super.key});
+class PopularArticleList extends StatefulWidget {
+  const PopularArticleList({super.key});
 
   @override
-  State<BookmarkArticles> createState() => _BookmarkArticlesState();
+  State<PopularArticleList> createState() => _PopularArticleListState();
 }
 
-class _BookmarkArticlesState extends State<BookmarkArticles> {
-  // Articles Data
-List<Map<String, String>> articles = [
+class _PopularArticleListState extends State<PopularArticleList> {
+
+  List<Map<String, String>> articles = [
     {
       'title': 'Unlock the Secrets of Succulents: Care Tips for Beginners',
       'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
@@ -35,6 +38,13 @@ List<Map<String, String>> articles = [
     },
   ];
 
+  List list = [
+    "Flutter",
+    "React",
+    "Ionic",
+    "Xamarin",
+  ];
+
   bool isLoading = true;
 
   @override
@@ -50,30 +60,67 @@ List<Map<String, String>> articles = [
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = ScreenSize.width(context);
+    var gapHeight1 = 10.0;
     return Scaffold(
-      body: Skeletonizer(
-        enabled: isLoading,
-        enableSwitchAnimation: true,
-        child: ListView.builder(
-          itemCount: isLoading ? 5 : articles.length,
-          padding: const EdgeInsets.all(16),
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: isLoading
-                  ? ArticleCardSkeleton()  // Show skeleton card when loading
-                  : ArticleCard(
-                title: articles[index]['title']!,
-                imageUrl: articles[index]['imageUrl']!,
+      appBar: CustomAppBar3(title: "Popular Article"),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: gapHeight1),
+            // Search Bar
+            GFSearchBar(
+              searchList: list,
+              searchQueryBuilder: (query, list) {
+                return list
+                    .where((item) =>
+                    item.toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+              },
+              overlaySearchListItemBuilder: (item) {
+                return Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    item,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                );
+              },
+              onItemSelected: (item) {
+                setState(() {
+                  print('$item');
+                });
+              },
+            ),
+            Skeletonizer(
+              enabled: isLoading,
+              enableSwitchAnimation: true,
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: isLoading ? 5 : articles.length,
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: isLoading
+                        ? ArticleCardSkeleton()
+                        : ArticleCard(
+                      title: articles[index]['title']!,
+                      imageUrl: articles[index]['imageUrl']!,
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 class ArticleCard extends StatelessWidget {
   final String title;
   final String imageUrl;
@@ -98,7 +145,10 @@ class ArticleCard extends StatelessWidget {
               fit: BoxFit.cover,
               height: 200,
               width: screenWidth,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => const CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 60,
+              ),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),

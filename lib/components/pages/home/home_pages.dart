@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:leafora/components/shared/widgets/custom_loader.dart';  // Import the package
+import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
@@ -68,6 +70,18 @@ class _HomePagesState extends State<HomePages> {
     },
   ];
 
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Simulate a loading delay
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +135,7 @@ class _HomePagesState extends State<HomePages> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Handle 'View All' action
+                      Get.toNamed("/popularArticle");
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -147,20 +161,26 @@ class _HomePagesState extends State<HomePages> {
               SizedBox(height: gapHeight1),
 
               // Horizontal List of Articles
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: articles.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ArticleCard(
-                        title: articles[index]['title']!,
-                        imageUrl: articles[index]['imageUrl']!,
-                      ),
-                    );
-                  },
+              Skeletonizer(
+                enabled: isLoading,
+                enableSwitchAnimation: true,
+                child: SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: isLoading ? 5 : articles.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: isLoading
+                            ? ArticleCardSkeleton()
+                            : ArticleCard(
+                          title: articles[index]['title']!,
+                          imageUrl: articles[index]['imageUrl']!,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
 
@@ -205,62 +225,27 @@ class _HomePagesState extends State<HomePages> {
               SizedBox(height: gapHeight1),
 
               // Explore Plants Grid
-              GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: plantCategories.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 3 / 2,
+              Skeletonizer(
+                enabled: isLoading,
+                enableSwitchAnimation: true,
+                child: GridView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: isLoading ? 6 : plantCategories.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 3 / 2,
+                  ),
+                  itemBuilder: (context, index) {
+                    return isLoading
+                        ? PlantCategorySkeleton()
+                        : PlantCategoryItem(
+                      plant: plantCategories[index],
+                    );
+                  },
                 ),
-                itemBuilder: (context, index) {
-                  final plant = plantCategories[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      border: Border.all(width: 1, color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: CachedNetworkImage(
-                            imageUrl: plant['image']!,
-                            height: 60,
-                            width: 60,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) =>
-                            const CustomLoader2(
-                              lottieAsset: 'assets/images/loader.json',
-                              size: 60,
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          plant['title']!,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                },
               ),
             ],
           ),
@@ -294,7 +279,10 @@ class ArticleCard extends StatelessWidget {
               fit: BoxFit.cover,
               height: 150,
               width: 200,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => const CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 60,
+              ),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),
@@ -318,6 +306,126 @@ class ArticleCard extends StatelessWidget {
                 color: Colors.black26,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ArticleCardSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 200,
+            height: 150,
+            color: Colors.grey[300],
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 20,
+                  color: Colors.grey[300],
+                ),
+              ),
+              Icon(
+                Icons.more_vert_rounded,
+                color: Colors.black26,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PlantCategoryItem extends StatelessWidget {
+  final Map<String, String> plant;
+
+  const PlantCategoryItem({required this.plant});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(width: 1, color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: plant['image']!,
+              height: 60,
+              width: 60,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 60,
+              ),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            plant['title']!,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PlantCategorySkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(width: 1, color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            height: 60,
+            width: 60,
+            color: Colors.grey[300],
+          ),
+          SizedBox(height: 8),
+          Container(
+            height: 14,
+            width: 100,
+            color: Colors.grey[300],
           ),
         ],
       ),

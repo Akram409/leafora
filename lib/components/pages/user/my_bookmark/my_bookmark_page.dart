@@ -11,8 +11,6 @@ class MyBookmarkPage extends StatefulWidget {
 }
 
 class _MyBookmarkPageState extends State<MyBookmarkPage> {
-  static const textStyle =
-      TextStyle(fontSize: 20, fontWeight: FontWeight.w500, );
   static const color = Colors.white;
   @override
   Widget build(BuildContext context) {
@@ -54,12 +52,13 @@ class _MyBookmarkPageState extends State<MyBookmarkPage> {
             preferredSize: Size.fromHeight(60),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.all(5),
+                width: screenWidth * 0.85,
+                padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: Colors.greenAccent, // Border color
-                    width: 3, // Border width
+                    color: Colors.greenAccent,
+                    width: 2,
                   ),
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -83,7 +82,7 @@ class _MyBookmarkPageState extends State<MyBookmarkPage> {
                           const SizedBox(width: 8),
                           Text(
                             "Plants",
-                            style: textStyle,
+                            style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500, ),
                           ),
                         ],
                       ),
@@ -98,7 +97,7 @@ class _MyBookmarkPageState extends State<MyBookmarkPage> {
                           const SizedBox(width: 8),
                           Text(
                             "Article",
-                            style: textStyle,
+                            style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500, ),
                           ),
                         ],
                       ),
