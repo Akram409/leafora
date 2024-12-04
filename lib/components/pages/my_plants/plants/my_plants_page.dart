@@ -3,14 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BookmarkPlants extends StatefulWidget {
-  const BookmarkPlants({super.key});
+class MyPlantsPage extends StatefulWidget {
+  const MyPlantsPage({super.key});
 
   @override
-  State<BookmarkPlants> createState() => _BookmarkPlantsState();
+  State<MyPlantsPage> createState() => _MyPlantsPageState();
 }
 
-class _BookmarkPlantsState extends State<BookmarkPlants> {
+class _MyPlantsPageState extends State<MyPlantsPage> {
   final List<Map<String, String>> plants = List.generate(10, (index) {
     return {
       'title': 'Plant Title $index',

@@ -199,7 +199,7 @@ class _HomePagesState extends State<HomePages> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Handle 'View All' action
+                      Get.toNamed("/explorePlants");
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

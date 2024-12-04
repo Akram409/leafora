@@ -6,8 +6,29 @@ class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createUser(UserModel user) async {
-    await _firestore.collection('users').doc(user.userId).set(user.toJson());
+    try {
+      // Ensure userId is set
+      if (user.userId == null || user.userId!.isEmpty) {
+        throw Exception("User ID cannot be null or empty.");
+      }
+
+      // Add userId to the user data (if not already added in `toJson`)
+      final userData = user.toJson();
+      userData['userId'] = user.userId;
+
+      // Save the user to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.userId)
+          .set(userData);
+
+      print("User saved to Firestore with ID: ${user.userId}");
+    } catch (e) {
+      print("Error saving user: $e");
+      throw Exception("Failed to create user: $e");
+    }
   }
+
 
   Future<UserModel?> getUser(String userId) async {
     DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();

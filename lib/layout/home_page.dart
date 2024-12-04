@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/home/home_pages.dart';
+import 'package:leafora/components/pages/my_account/my_account.dart';
+import 'package:leafora/components/pages/my_plants/my_plants.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 
@@ -30,9 +32,9 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> pages = [
     HomePages(),
     DiagnosePage(),
-    HomePages(),
-    HomePages(),
-    HomePages(),
+    DiagnosePage(),
+    MyPlants(),
+    MyAccount(),
   ];
 
   final List<String> titles = [
@@ -59,7 +61,7 @@ class _HomePageState extends State<HomePage> {
         child: CurvedNavigationBar(
           key: navigationKey,
           backgroundColor: Colors.transparent,
-          color: Colors.greenAccent,
+          color: Colors.green,
           buttonBackgroundColor: Colors.green,
           index: currentIndex,
           height: 70,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
@@ -130,50 +131,55 @@ class ArticleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    return Container(
-      width: screenWidth,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              height: 200,
-              width: screenWidth,
-              placeholder: (context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenWidth * 0.04,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed("/articleDetails");
+      },
+      child: Container(
+        width: screenWidth,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                height: 200,
+                width: screenWidth,
+                placeholder: (context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
                 ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              Icon(
-                Icons.more_vert_rounded,
-                size: screenWidth * 0.05,
-                color: Colors.black26,
-              ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.04,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  Icons.more_vert_rounded,
+                  size: screenWidth * 0.05,
+                  color: Colors.black26,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

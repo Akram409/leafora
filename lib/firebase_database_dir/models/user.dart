@@ -1,37 +1,37 @@
 class UserModel {
-  final String userId;
-  final String userName;
-  final String userEmail;
-  final String userImage;
-  final String userPhone;
-  final String userAddress;
-  final String gender;
-  final String dob;
-  final bool plan;
-  final bool status;
-  final int? otp;
-  final String fcmToken;
-  final String role;
-  final List<String>? notification;
-  final List<String>? bookmarks;
-  final List<Map<String, String>>? myPlants;
-  final List<String>? diagnosisHistory;
-  final List<String>? postArticle;
+  String? userName;
+  String? userId;
+  Map<String, String>? userImage;
+  String? userEmail;
+  String? userPhone;
+  String? userAddress;
+  String? gender;
+  String? dob;
+  String? plan;
+  String? status;
+  String? otp;
+  String? fcmToken;
+  String? role;
+  List<String>? notification;
+  List<String>? bookmarks;
+  List<MyPlants>? myPlants;
+  List<String>? diagnosisHistory;
+  List<String>? postArticle;
 
   UserModel({
-    required this.userId,
-    required this.userName,
-    required this.userEmail,
-    required this.userImage,
-    required this.userPhone,
-    required this.userAddress,
-    required this.gender,
-    required this.dob,
-    required this.plan,
-    required this.status,
+    this.userName,
+    this.userId,
+    this.userImage,
+    this.userEmail,
+    this.userPhone,
+    this.userAddress,
+    this.gender,
+    this.dob,
+    this.plan,
+    this.status,
     this.otp,
-    required this.fcmToken,
-    required this.role,
+    this.fcmToken,
+    this.role,
     this.notification,
     this.bookmarks,
     this.myPlants,
@@ -41,49 +41,74 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      userId: json['userId'],
       userName: json['userName'],
+      userId: json['userId'],
+      userImage: json['userImage'] != null
+          ? Map<String, String>.from(json['userImage'])
+          : null,
       userEmail: json['userEmail'],
-      userImage: json['userImage'] ?? "",
       userPhone: json['userPhone'],
-      userAddress: json['userAddress'] ?? "",
+      userAddress: json['userAddress'],
       gender: json['gender'],
       dob: json['dob'],
       plan: json['plan'],
       status: json['status'],
       otp: json['otp'],
-      fcmToken: json['fcm_token'] ?? "",
+      fcmToken: json['fcm_token'],
       role: json['role'],
-      notification: json['notification'] != null ? List<String>.from(json['notification']) : null,
-      bookmarks: json['bookmarks'] != null ? List<String>.from(json['bookmarks']) : null,
+      notification: json['notification']?.cast<String>(),
+      bookmarks: json['bookmarks']?.cast<String>(),
       myPlants: json['my_plants'] != null
-          ? List<Map<String, String>>.from(json['my_plants'].map((plant) => Map<String, String>.from(plant)))
+          ? (json['my_plants'] as List)
+          .map((plant) => MyPlants.fromJson(plant))
+          .toList()
           : null,
-      diagnosisHistory: json['diagnosis_history'] != null ? List<String>.from(json['diagnosis_history']) : null,
-      postArticle: json['post_article'] != null ? List<String>.from(json['post_article']) : null,
+      diagnosisHistory: json['diagnosis_history']?.cast<String>(),
+      postArticle: json['post_article']?.cast<String>(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'userName': userName,
-      'userEmail': userEmail,
-      'userImage': userImage,
-      'userPhone': userPhone,
-      'userAddress': userAddress,
-      'gender': gender,
-      'dob': dob,
-      'plan': plan,
-      'status': status,
-      'otp': otp,
-      'fcm_token': fcmToken,
-      'role': role,
-      'notification': notification,
-      'bookmarks': bookmarks,
-      'my_plants': myPlants,
-      'diagnosis_history': diagnosisHistory,
-      'post_article': postArticle,
-    };
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userName'] = userName;
+    data['userId'] = userId;
+    data['userImage'] = userImage;
+    data['userEmail'] = userEmail;
+    data['userPhone'] = userPhone;
+    data['userAddress'] = userAddress;
+    data['gender'] = gender;
+    data['dob'] = dob;
+    data['plan'] = plan;
+    data['status'] = status;
+    data['otp'] = otp;
+    data['fcm_token'] = fcmToken;
+    data['role'] = role;
+    data['notification'] = notification;
+    data['bookmarks'] = bookmarks;
+    if (myPlants != null) {
+      data['my_plants'] = myPlants!.map((plant) => plant.toJson()).toList();
+    }
+    data['diagnosis_history'] = diagnosisHistory;
+    data['post_article'] = postArticle;
+    return data;
+  }
+}
+
+class MyPlants {
+  String? plantId;
+  String? plantType;
+
+  MyPlants({this.plantId, this.plantType});
+
+  MyPlants.fromJson(Map<String, dynamic> json) {
+    plantId = json['plantId'];
+    plantType = json['plantType'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['plantId'] = plantId;
+    data['plantType'] = plantType;
+    return data;
   }
 }

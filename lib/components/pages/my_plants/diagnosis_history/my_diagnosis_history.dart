@@ -3,14 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BookmarkPlants extends StatefulWidget {
-  const BookmarkPlants({super.key});
+class MyDiagnosisHistory extends StatefulWidget {
+  const MyDiagnosisHistory({super.key});
 
   @override
-  State<BookmarkPlants> createState() => _BookmarkPlantsState();
+  State<MyDiagnosisHistory> createState() => _MyDiagnosisHistoryState();
 }
 
-class _BookmarkPlantsState extends State<BookmarkPlants> {
+class _MyDiagnosisHistoryState extends State<MyDiagnosisHistory> {
   final List<Map<String, String>> plants = List.generate(10, (index) {
     return {
       'title': 'Plant Title $index',
@@ -48,11 +48,11 @@ class _BookmarkPlantsState extends State<BookmarkPlants> {
               child: isLoading
                   ? BookmarkPlantCardSkeleton()
                   : BookmarkPlantCard(
-                title: plants[index]['title']!,
-                semiTitle: plants[index]['semiTitle']!,
-                genusName: plants[index]['genusName']!,
-                imageUrl: plants[index]['imageUrl']!,
-              ),
+                      title: plants[index]['title']!,
+                      semiTitle: plants[index]['semiTitle']!,
+                      genusName: plants[index]['genusName']!,
+                      imageUrl: plants[index]['imageUrl']!,
+                    ),
             );
           },
         ),
@@ -85,7 +85,8 @@ class _BookmarkPlantCardState extends State<BookmarkPlantCard> {
     var screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
-        Get.toNamed("/plantDetails"); // TODO : set the arguments here to see details of the plants
+        Get.toNamed(
+            "/plantDetails"); // TODO : set the arguments here to see details of the plants
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 10),
