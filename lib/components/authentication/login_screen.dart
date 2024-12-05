@@ -147,94 +147,217 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/login_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          // Login Content
+          Center(
+            child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Login',
-                        style: GoogleFonts.lobster(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueAccent,
-                          letterSpacing: 1.5,
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  elevation: 9.0,
+                  shadowColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/bg4.png'),
+                        fit: BoxFit.cover,
+
+                        colorFilter: ColorFilter.mode(
+                          Colors.white.withOpacity(0.2),
+                          BlendMode.lighten,
                         ),
                       ),
-
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Login',
+                              style: GoogleFonts.lobster(
+                                fontSize: MediaQuery.sizeOf(context).width * 0.15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                                letterSpacing: 4,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            TextFormField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500
+                                ),
+                                prefixIcon: Icon(Icons.email),
+                                prefixIconColor: Colors.black,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.black,
+                                    width: 2.0,
+                                    style: BorderStyle.solid
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.green,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                    width: 2.0,
+                                    style: BorderStyle.solid
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200]?.withOpacity(0.5),
+                              ),
+                              validator: _validateEmail,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500
+                                ),
+                                prefixIcon: Icon(Icons.lock),
+                                prefixIconColor: Colors.black,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 2.0,
+                                      style: BorderStyle.solid
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.green,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey,
+                                      width: 2.0,
+                                      style: BorderStyle.solid
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200]?.withOpacity(0.5),
+                              ),
+                              obscureText: true,
+                              validator: _validatePassword,
+                            ),
+                            const SizedBox(height: 20),
+                            _isLoading
+                                ? CustomLoader(color: Colors.greenAccent, size: 50.0)
+                                : ElevatedButton(
+                              onPressed: _login,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 50,
+                                    vertical: 12
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                      color: Colors.green[800]!,
+                                      width: 2
+                                  ),
+                                ),
+                                elevation: 2,
+                                shadowColor: Colors.green[900],
+                                textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.3,
+                                ),
+                              ),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: MediaQuery.sizeOf(context).width * 0.05,
+                                  color: Colors.white, // Ensure white text
+                                  fontWeight: FontWeight.w600, // Semi-bold weight
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Get.to(() => SignupScreen(),
+                                    transition: Transition.rightToLeft,
+                                    duration: const Duration(milliseconds: 500));
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.green[700],
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Don't have an account? ",
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "Sign Up",
+                                      style: TextStyle(
+                                        color: Colors.green[700],
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        validator: _validateEmail,
-                        keyboardType: TextInputType.emailAddress,
                       ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                        ),
-                        obscureText: true,
-                        validator: _validatePassword,
-                      ),
-                      SizedBox(height: 20),
-                      _isLoading
-                          ? CustomLoader(color: Colors.greenAccent, size: 50.0)
-                          : ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.blueAccent, width: 2),
-                          ),
-                        ),
-                        child: Text('Login'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => SignupScreen(),
-
-                              transition: Transition.rightToLeft, duration: Duration(milliseconds: 500));
-                        },
-                        child: Text("Don't have an account? Sign Up"),
-                      ),
-
-
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

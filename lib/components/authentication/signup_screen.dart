@@ -127,124 +127,198 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/login_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Signup Content
+          Center(
+            child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Sign Up',
-                        style: GoogleFonts.lobster(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueAccent,
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  elevation: 9.0,
+                  shadowColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/login_card_bg.jpg'),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.white.withOpacity(0.2),
+                          BlendMode.lighten,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: _openFilePicker,
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.grey[200],
-                          child: ClipOval(
-                            child: _filePickerResult != null
-                                ? Image.file(
-                              File(_filePickerResult!.files.single.path!),
-                              fit: BoxFit.cover,
-                              width: 120,
-                              height: 120,
-                            )
-                                : Icon(
-                              Icons.camera_alt,
-                              size: 50,
-                              color: Colors.grey,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Sign Up',
+                              style: GoogleFonts.lobster(
+                                fontSize: MediaQuery.sizeOf(context).width * 0.15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                                letterSpacing: 4,
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 20),
+                            GestureDetector(
+                              onTap: _openFilePicker,
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.grey[200],
+                                child: ClipOval(
+                                  child: _filePickerResult != null
+                                      ? Image.file(
+                                    File(_filePickerResult!.files.single.path!),
+                                    fit: BoxFit.cover,
+                                    width: 120,
+                                    height: 120,
+                                  )
+                                      : Icon(
+                                    Icons.camera_alt,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTextField(_nameController, 'Name', Icons.person),
+                            const SizedBox(height: 10),
+                            _buildTextField(_emailController, 'Email', Icons.email),
+                            const SizedBox(height: 10),
+                            _buildTextField(_passwordController, 'Password', Icons.lock,
+                                obscureText: true),
+                            const SizedBox(height: 10),
+                            _buildTextField(_phoneController, 'Phone Number', Icons.phone),
+                            const SizedBox(height: 10),
+                            _buildTextField(_dobController, 'Date of Birth', Icons.cake),
+                            const SizedBox(height: 10),
+                            _buildTextField(_genderController, 'Gender', Icons.transgender),
+                            const SizedBox(height: 20),
+                            _isLoading
+                                ? CustomLoader(color: Colors.green, size: 40.0)
+                                : ElevatedButton(
+                              onPressed: _signup,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 50,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: Colors.green[800]!,
+                                    width: 2,
+                                  ),
+                                ),
+                                elevation: 2,
+                                shadowColor: Colors.green[900],
+                                textStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.3,
+                                ),
+                              ),
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontSize: MediaQuery.sizeOf(context).width * 0.05,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Get.offAll(() => LoginScreen()),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.green[700],
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Already have an account? ",
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "Login",
+                                      style: TextStyle(
+                                        color: Colors.green[700],
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: 'Name',
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                        validator: (value) => _validateField(value, 'name'),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
-                        ),
-                        validator: (value) => _validateField(value, 'email'),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
-                        ),
-                        obscureText: true,
-                        validator: (value) => _validateField(value, 'password'),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          labelText: 'Phone Number',
-                          prefixIcon: Icon(Icons.phone),
-                        ),
-                        validator: (value) => _validateField(value, 'phone number'),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _dobController,
-                        decoration: InputDecoration(
-                          labelText: 'Date of Birth',
-                          prefixIcon: Icon(Icons.cake),
-                        ),
-                        validator: (value) => _validateField(value, 'date of birth'),
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: _genderController,
-                        decoration: InputDecoration(
-                          labelText: 'Gender',
-                          prefixIcon: Icon(Icons.transgender),
-                        ),
-                        validator: (value) => _validateField(value, 'gender'),
-                      ),
-                      SizedBox(height: 20),
-                      _isLoading
-                          ? CustomLoader(color: Colors.green, size: 40.0)
-                          : ElevatedButton(
-                        onPressed: _signup,
-                        child: Text('Sign Up'),
-                      ),
-                      TextButton(
-                        onPressed: () => Get.offAll(() => LoginScreen()),
-                        child: Text("Already have an account? Login"),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText, IconData icon,
+      {bool obscureText = false}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
+        prefixIcon: Icon(icon),
+        prefixIconColor: Colors.black,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Colors.black,
+            width: 2.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Colors.green,
+            width: 2,
+            // shape: Box Border
           ),
         ),
       ),
