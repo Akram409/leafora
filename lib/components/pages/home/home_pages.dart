@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
+import 'package:leafora/components/pages/article/article_details/article_details.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/firebase_database_dir/models/article.dart';
+import 'package:leafora/firebase_database_dir/service/article_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePages extends StatefulWidget {
@@ -14,6 +17,7 @@ class HomePages extends StatefulWidget {
 }
 
 class _HomePagesState extends State<HomePages> {
+  final ArticleService _articleService = ArticleService();
   List list = [
     "Flutter",
     "React",
@@ -102,7 +106,7 @@ class _HomePagesState extends State<HomePages> {
                 searchQueryBuilder: (query, list) {
                   return list
                       .where((item) =>
-                      item.toLowerCase().contains(query.toLowerCase()))
+                          item.toLowerCase().contains(query.toLowerCase()))
                       .toList();
                 },
                 overlaySearchListItemBuilder: (item) {
@@ -161,27 +165,50 @@ class _HomePagesState extends State<HomePages> {
               SizedBox(height: gapHeight1),
 
               // Horizontal List of Articles
-              Skeletonizer(
-                enabled: isLoading,
-                enableSwitchAnimation: true,
-                child: SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: isLoading ? 5 : articles.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: isLoading
-                            ? ArticleCardSkeleton()
-                            : ArticleCard(
-                          title: articles[index]['title']!,
-                          imageUrl: articles[index]['imageUrl']!,
+              StreamBuilder<List<ArticleModel>>(
+                stream: _articleService.getAllArticlesStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Skeletonizer(
+                      enabled: true,
+                      child: SizedBox(
+                        height: 200,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            return ArticleCardSkeleton();
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Failed to load articles.'),
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text('No articles found.'),
+                    );
+                  }
+
+                  final articles = snapshot.data!;
+                  return SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: articles.length,
+                      itemBuilder: (context, index) {
+                        final article = articles[index];
+                        return  ArticleCard(article: article);
+                      },
+                    ),
+                  );
+                },
               ),
 
               SizedBox(height: gapHeight1),
@@ -242,8 +269,8 @@ class _HomePagesState extends State<HomePages> {
                     return isLoading
                         ? PlantCategorySkeleton()
                         : PlantCategoryItem(
-                      plant: plantCategories[index],
-                    );
+                            plant: plantCategories[index],
+                          );
                   },
                 ),
               ),
@@ -256,62 +283,68 @@ class _HomePagesState extends State<HomePages> {
 }
 
 class ArticleCard extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+  final ArticleModel article;
 
-  const ArticleCard({required this.title, required this.imageUrl});
+  const ArticleCard({required this.article});
 
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    return Container(
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              height: 150,
-              width: 200,
-              placeholder: (context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenWidth * 0.04,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () {
+        print("Article Data: ${article.toJson()}");
+        Get.to(ArticleDetails(), arguments: article.toJson());
+      },
+      child: Container(
+        width: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: article.articleImage,
+                fit: BoxFit.cover,
+                height: 150,
+                width: 200,
+                placeholder: (context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
                 ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              Icon(
-                Icons.more_vert_rounded,
-                size: screenWidth * 0.05,
-                color: Colors.black26,
-              ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    article.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.04,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  Icons.more_vert_rounded,
+                  size: screenWidth * 0.05,
+                  color: Colors.black26,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class ArticleCardSkeleton extends StatelessWidget {
   @override

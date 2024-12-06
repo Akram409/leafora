@@ -24,4 +24,13 @@ class ArticleService {
   Future<void> deleteArticle(String articleId) async {
     await _firestore.collection('articles').doc(articleId).delete();
   }
+
+  // New method to get a stream of all articles
+  Stream<List<ArticleModel>> getAllArticlesStream() {
+    return _firestore.collection('articles').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return ArticleModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
 }
