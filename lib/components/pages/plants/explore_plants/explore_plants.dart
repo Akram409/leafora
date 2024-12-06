@@ -4,6 +4,8 @@ import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/firebase_database_dir/models/plant.dart';
+import 'package:leafora/firebase_database_dir/service/plant_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ExplorePlants extends StatefulWidget {
@@ -14,6 +16,7 @@ class ExplorePlants extends StatefulWidget {
 }
 
 class _ExplorePlantsState extends State<ExplorePlants> {
+  final PlantService _plantService = PlantService();
   List list = [
     "Flutter",
     "React",
@@ -98,21 +101,52 @@ class _ExplorePlantsState extends State<ExplorePlants> {
               child: Skeletonizer(
                 enabled: isLoading,
                 enableSwitchAnimation: true,
-                child: GridView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: isLoading ? 6 : plantCategories.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 3 / 2,
-                  ),
-                  itemBuilder: (context, index) {
-                    return isLoading
-                        ? PlantCategorySkeleton()
-                        : PlantCategoryItem(
-                      plant: plantCategories[index],
+                child: StreamBuilder<List<PlantModel>>(
+                  stream: _plantService.getAllPlantsStream(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 6, // Skeleton items count
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 3 / 2,
+                        ),
+                        itemBuilder: (context, index) {
+                          return PlantCategorySkeleton();
+                        },
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Failed to load plant categories.'));
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No plant categories available.'));
+                    }
+
+                    // Get the plant categories from the snapshot data
+                    final plantCategories = snapshot.data!;
+                    return GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: plantCategories.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 3 / 2,
+                      ),
+                      itemBuilder: (context, index) {
+                        final plantCategory = plantCategories[index];
+                        return PlantCategoryItem(
+                          plant: plantCategory,
+                        );
+                      },
                     );
                   },
                 ),
@@ -125,8 +159,7 @@ class _ExplorePlantsState extends State<ExplorePlants> {
   }
 }
 class PlantCategoryItem extends StatelessWidget {
-
-  final Map<String, String> plant;
+  final PlantModel plant;
 
   const PlantCategoryItem({required this.plant});
 
@@ -151,7 +184,7 @@ class PlantCategoryItem extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: CachedNetworkImage(
-              imageUrl: plant['image']!,
+              imageUrl: plant.plantImage!,
               height: 60,
               width: 60,
               fit: BoxFit.cover,
@@ -164,7 +197,7 @@ class PlantCategoryItem extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            plant['title']!,
+            plant.plantName!,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: screenWidth * 0.03,
