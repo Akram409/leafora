@@ -6,7 +6,9 @@ import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/firebase_database_dir/models/article.dart';
+import 'package:leafora/firebase_database_dir/models/plant.dart';
 import 'package:leafora/firebase_database_dir/service/article_service.dart';
+import 'package:leafora/firebase_database_dir/service/plant_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePages extends StatefulWidget {
@@ -18,35 +20,12 @@ class HomePages extends StatefulWidget {
 
 class _HomePagesState extends State<HomePages> {
   final ArticleService _articleService = ArticleService();
+  final PlantService _plantService = PlantService();
   List list = [
     "Flutter",
     "React",
     "Ionic",
     "Xamarin",
-  ];
-
-  // Articles Data
-  List<Map<String, String>> articles = [
-    {
-      'title': 'Unlock the Secrets of Succulents: Care Tips for Beginners',
-      'imageUrl': 'https://i.ibb.co.com/5M46jVS/placeholder-image.jpg',
-    },
-    {
-      'title': 'The Ultimate Guide to Indoor Plants: From A to Z',
-      'imageUrl': 'https://i.ibb.co.com/5M46jVS/placeholder-image.jpg',
-    },
-    {
-      'title': 'Why You Should Start Growing Your Own Herbs at Home',
-      'imageUrl': 'https://i.ibb.co.com/5M46jVS/placeholder-image.jpg',
-    },
-    {
-      'title': 'Top 10 Indoor Plants That Thrive in Low Light',
-      'imageUrl': 'https://i.ibb.co.com/5M46jVS/placeholder-image.jpg',
-    },
-    {
-      'title': 'How to Care for Orchids: Tips from Experts',
-      'imageUrl': 'https://i.ibb.co.com/5M46jVS/placeholder-image.jpg',
-    },
   ];
 
   // Plant Categories Data
@@ -252,27 +231,65 @@ class _HomePagesState extends State<HomePages> {
               SizedBox(height: gapHeight1),
 
               // Explore Plants Grid
-              Skeletonizer(
-                enabled: isLoading,
-                enableSwitchAnimation: true,
-                child: GridView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: isLoading ? 6 : plantCategories.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 3 / 2,
-                  ),
-                  itemBuilder: (context, index) {
-                    return isLoading
-                        ? PlantCategorySkeleton()
-                        : PlantCategoryItem(
-                            plant: plantCategories[index],
-                          );
-                  },
-                ),
+              StreamBuilder<List<PlantModel>>(
+                stream: _plantService.getAllPlantsStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Wrap the grid with Skeletonizer while loading
+                    return Skeletonizer(
+                      enabled: true,
+                      enableSwitchAnimation: true,
+                      child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 6, // Skeleton items
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 3 / 2,
+                        ),
+                        itemBuilder: (context, index) {
+                          return PlantCategorySkeleton();
+                        },
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Failed to load plants.'),
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text('No plants found.'),
+                    );
+                  }
+
+                  final plants = snapshot.data!;
+                  return GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: plants.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 3 / 2,
+                    ),
+                    itemBuilder: (context, index) {
+                      final plant = plants[index];
+                      return PlantCategoryItem(
+                        plant: {
+                          'title': plant.plantName!,
+                          'image': plant.plantImage!,
+                        },
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),
@@ -387,49 +404,58 @@ class PlantCategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        border: Border.all(width: 1, color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: plant['image']!,
-              height: 60,
-              width: 60,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
+    return GestureDetector(
+      onTap: () {
+        print("Tapped on plant category: ${plant['title']}");
+        // Example: Get.toNamed("/plantDetails", arguments: plant);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(width: 1, color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Plant image from dynamic data (URL)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: plant['image']!,
+                height: 60,
+                width: 60,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            plant['title']!,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
+            SizedBox(height: 8),
+            // Plant title from dynamic data
+            Text(
+              plant['title']!,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class PlantCategorySkeleton extends StatelessWidget {
   @override

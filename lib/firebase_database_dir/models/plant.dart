@@ -1,91 +1,125 @@
 class PlantModel {
-  final String plantId;
-  final String plantImage;
-  final String plantName;
-  final String scientificName;
-  final String plantType;
-  final String genus;
-  final String plantDescription;
-  final List<Map<String, String>> conditions;
-  final List<Map<String, String>> care;
-  final String commonDisease;
-  final String specialFeature;
-  final String uses;
-  final String funFact;
-  final int helpful;
-  final int notHelpful;
-  final String authorId;
-  final String authorName;
-  final String? authorImage;
+  String? plantId;
+  String? plantImage;
+  String? plantName;
+  String? scientificName;
+  String? plantType;
+  String? genus;
+  String? plantDescription;
+  Description? description;
+  int? helpful;
+  int? notHelpful;
+  String? author;
 
-  PlantModel({
-    required this.plantId,
-    required this.plantImage,
-    required this.plantName,
-    required this.scientificName,
-    required this.plantType,
-    required this.genus,
-    required this.plantDescription,
-    required this.conditions,
-    required this.care,
-    required this.commonDisease,
-    required this.specialFeature,
-    required this.uses,
-    required this.funFact,
-    required this.helpful,
-    required this.notHelpful,
-    required this.authorId,
-    required this.authorName,
-    this.authorImage,
-  });
+  PlantModel(
+      {required this.plantId,
+      required this.plantImage,
+      required this.plantName,
+      required this.scientificName,
+      required this.plantType,
+      required this.genus,
+      required this.plantDescription,
+      required this.description,
+      this.helpful,
+      this.notHelpful,
+      required this.author});
 
   factory PlantModel.fromJson(Map<String, dynamic> json) {
     return PlantModel(
       plantId: json['plantId'],
-      plantImage: json['plantImage'] ?? "",
+      plantImage: json['plantImage'],
       plantName: json['plantName'],
       scientificName: json['scientificName'],
       plantType: json['plantType'],
       genus: json['genus'],
       plantDescription: json['plantDescription'],
-      conditions: List<Map<String, String>>.from(
-        json['conditions'].map((condition) => Map<String, String>.from(condition)),
-      ),
-      care: List<Map<String, String>>.from(
-        json['care'].map((careItem) => Map<String, String>.from(careItem)),
-      ),
-      commonDisease: json['common_disease'],
-      specialFeature: json['specialFeature'],
-      uses: json['uses'],
-      funFact: json['funFact'],
+      description: Description.fromJson(json['description']),
       helpful: json['helpful'],
-      notHelpful: json['not_helpful'],
-      authorId: json['authorId'],
-      authorName: json['authorName'],
-      authorImage: json['authorImage'],
+      notHelpful: json['notHelpful'],
+      author: json['author'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'plantId': plantId,
-      'plantImage': plantImage,
-      'plantName': plantName,
-      'scientificName': scientificName,
-      'plantType': plantType,
-      'genus': genus,
-      'plantDescription': plantDescription,
-      'conditions': conditions,
-      'care': care,
-      'common_disease': commonDisease,
-      'specialFeature': specialFeature,
-      'uses': uses,
-      'funFact': funFact,
-      'helpful': helpful,
-      'not_helpful': notHelpful,
-      'authorId': authorId,
-      'authorName': authorName,
-      'authorImage': authorImage,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['plantId'] = this.plantId;
+    data['plantImage'] = this.plantImage;
+    data['plantName'] = this.plantName;
+    data['scientificName'] = this.scientificName;
+    data['plantType'] = this.plantType;
+    data['genus'] = this.genus;
+    data['plantDescription'] = this.plantDescription;
+    if (this.description != null) {
+      data['description'] = this.description!.toJson();
+    }
+    data['helpful'] = this.helpful;
+    data['not_helpful'] = this.notHelpful;
+    data['author'] = this.author;
+    return data;
+  }
+}
+
+class Description {
+  List<Ops>? ops;
+
+  Description({this.ops});
+
+  Description.fromJson(Map<String, dynamic> json) {
+    if (json['ops'] != null) {
+      ops = <Ops>[];
+      json['ops'].forEach((v) {
+        ops!.add(new Ops.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.ops != null) {
+      data['ops'] = this.ops!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Ops {
+  String? insert;
+  Attributes? attributes;
+
+  Ops({this.insert, this.attributes});
+
+  Ops.fromJson(Map<String, dynamic> json) {
+    insert = json['insert'];
+    attributes = json['attributes'] != null
+        ? new Attributes.fromJson(json['attributes'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['insert'] = this.insert;
+    if (this.attributes != null) {
+      data['attributes'] = this.attributes!.toJson();
+    }
+    return data;
+  }
+}
+
+class Attributes {
+  bool? bold;
+  int? header;
+
+  Attributes({this.bold, this.header});
+
+  Attributes.fromJson(Map<String, dynamic> json) {
+    bold = json['bold'];
+    header = json['header'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['bold'] = this.bold;
+    data['header'] = this.header;
+    return data;
   }
 }

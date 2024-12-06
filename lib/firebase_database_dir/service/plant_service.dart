@@ -23,4 +23,13 @@ class PlantService {
   Future<void> deletePlant(String plantId) async {
     await _firestore.collection('plants').doc(plantId).delete();
   }
+
+  Stream<List<PlantModel>> getAllPlantsStream() {
+    return _firestore.collection('plants').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return PlantModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
 }
