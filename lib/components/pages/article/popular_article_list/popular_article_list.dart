@@ -5,6 +5,8 @@ import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/firebase_database_dir/models/article.dart';
+import 'package:leafora/firebase_database_dir/service/article_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class PopularArticleList extends StatefulWidget {
@@ -15,7 +17,7 @@ class PopularArticleList extends StatefulWidget {
 }
 
 class _PopularArticleListState extends State<PopularArticleList> {
-
+  final ArticleService _articleService = ArticleService();
   List<Map<String, String>> articles = [
     {
       'title': 'Unlock the Secrets of Succulents: Care Tips for Beginners',
@@ -98,20 +100,48 @@ class _PopularArticleListState extends State<PopularArticleList> {
             Skeletonizer(
               enabled: isLoading,
               enableSwitchAnimation: true,
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: isLoading ? 5 : articles.length,
-                padding: const EdgeInsets.all(16),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: isLoading
-                        ? ArticleCardSkeleton()
-                        : ArticleCard(
-                      title: articles[index]['title']!,
-                      imageUrl: articles[index]['imageUrl']!,
-                    ),
+              child: StreamBuilder<List<ArticleModel>>(
+                stream: _articleService.getAllArticlesStream(), // Assuming Firebase stream
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 5, // Simulating loading 5 skeleton items
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          child: ArticleCardSkeleton(),
+                        );
+                      },
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Failed to load articles.'));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No articles available.'));
+                  }
+
+                  // Get articles from the snapshot
+                  final articles = snapshot.data!;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: articles.length,
+                    padding: const EdgeInsets.all(16),
+                    itemBuilder: (context, index) {
+                      final article = articles[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: ArticleCard(
+                          title: article.title, // Dynamic title
+                          imageUrl: article.articleImage, // Dynamic image URL
+                        ),
+                      );
+                    },
                   );
                 },
               ),
