@@ -137,8 +137,7 @@ class _PopularArticleListState extends State<PopularArticleList> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         child: ArticleCard(
-                          title: article.title, // Dynamic title
-                          imageUrl: article.articleImage, // Dynamic image URL
+                          article: article,
                         ),
                       );
                     },
@@ -153,17 +152,19 @@ class _PopularArticleListState extends State<PopularArticleList> {
   }
 }
 class ArticleCard extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+  final ArticleModel article;
 
-  const ArticleCard({required this.title, required this.imageUrl});
+  const ArticleCard({required this.article});
 
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () {
-        Get.toNamed("/articleDetails");
+        Get.toNamed(
+          "/articleDetails",
+          arguments: article,
+        );
       },
       child: Container(
         width: screenWidth,
@@ -176,7 +177,7 @@ class ArticleCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: CachedNetworkImage(
-                imageUrl: imageUrl,
+                imageUrl: article.articleImage,
                 fit: BoxFit.cover,
                 height: 200,
                 width: screenWidth,
@@ -192,7 +193,7 @@ class ArticleCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    title,
+                    article.title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: screenWidth * 0.04,
@@ -214,6 +215,7 @@ class ArticleCard extends StatelessWidget {
     );
   }
 }
+
 
 class ArticleCardSkeleton extends StatelessWidget {
   @override

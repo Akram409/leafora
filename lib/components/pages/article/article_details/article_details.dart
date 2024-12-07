@@ -20,8 +20,7 @@ class _ArticleDetailsState extends State<ArticleDetails> {
   void initState() {
     super.initState();
 
-    final Map<String, dynamic> arguments = Get.arguments;
-    articleData = ArticleModel.fromJson(arguments);
+    articleData = Get.arguments as ArticleModel;
 
     // Ensure the last operation ends with a newline
     List<dynamic> ops = articleData.description['ops'] ?? [];

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:leafora/components/authentication/login_screen.dart';
 import 'package:leafora/components/onBoarding/animated_onboarding.dart';
 import 'package:leafora/components/shared/widgets/loading_indicator.dart';
@@ -88,7 +89,33 @@ class _SplashState extends State<Splash> {
               ),
             ),
             const SizedBox(
-              height: 15,
+              height: 10,
+            ),
+            Center(
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    colors: [
+                      Colors.green,
+                      Colors.greenAccent,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds);
+                },
+                child: Text(
+                  "Lefora",
+                  style: GoogleFonts.pirataOne(
+                    fontSize: MediaQuery.sizeOf(context).width * 0.15,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 30,
             ),
             const CustomLoader(color: Colors.greenAccent, size: 50.0),
           ],
