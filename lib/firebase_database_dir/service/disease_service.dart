@@ -23,4 +23,12 @@ class DiseaseService {
   Future<void> deleteDisease(String diseaseId) async {
     await _firestore.collection('diseases').doc(diseaseId).delete();
   }
+
+  Stream<List<DiseaseModel>> streamAllDiseases() {
+    return _firestore.collection('diseases').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return DiseaseModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
 }

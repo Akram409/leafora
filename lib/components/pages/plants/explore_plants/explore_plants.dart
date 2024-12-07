@@ -158,6 +158,7 @@ class _ExplorePlantsState extends State<ExplorePlants> {
     );
   }
 }
+
 class PlantCategoryItem extends StatelessWidget {
   final PlantModel plant;
 
@@ -196,13 +197,15 @@ class PlantCategoryItem extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8),
-          Text(
-            plant.plantName!,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: screenWidth * 0.03,
+          FittedBox(
+            child: Text(
+              plant.plantName!,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: screenWidth * 0.04,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

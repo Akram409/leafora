@@ -5,6 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_card.dart';
+import 'package:leafora/firebase_database_dir/models/disease.dart';
+import 'package:leafora/firebase_database_dir/models/disease_type.dart';
+import 'package:leafora/firebase_database_dir/service/disease_service.dart';
+import 'package:leafora/firebase_database_dir/service/disease_type_service.dart';
 
 class DiagnosePage extends StatefulWidget {
   const DiagnosePage({super.key});
@@ -14,7 +18,8 @@ class DiagnosePage extends StatefulWidget {
 }
 
 class _DiagnosePageState extends State<DiagnosePage> {
-
+  final DiseaseService diseaseService = DiseaseService();
+  final DiseaseTypeService diseaseTypeService = DiseaseTypeService();
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
 
   // Common Diseases Data
@@ -68,6 +73,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
 
   @override
   Widget build(BuildContext context) {
+
     var screenWidth = ScreenSize.width(context);
     var gapHeight1 = 20.0;
     return Scaffold(
@@ -128,23 +134,49 @@ class _DiagnosePageState extends State<DiagnosePage> {
 
               SizedBox(height: gapHeight1),
 
-              // Horizontal List of disease
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: diseases.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: DiseaseCard(
-                        title: diseases[index]['title']!,
-                        imageUrl: diseases[index]['imageUrl']!,
+              // Dynamic Horizontal List of Diseases
+              StreamBuilder<List<DiseaseModel>>(
+                stream: diseaseService.streamAllDiseases(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5, // Number of skeletons to show
+                        itemBuilder: (context, index) => DiseaseSkeletonCard(),
                       ),
                     );
-                  },
-                ),
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No diseases found.'));
+                  }
+
+                  List<DiseaseModel> diseases = snapshot.data!;
+                  print("Diseases: ${diseases.map((disease) => disease.diseaseName ?? 'No Name').toList()}");
+
+                  return SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: diseases.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: DiseaseCard(
+                            title: diseases[index].diseaseName ?? 'Unknown Disease', // Fallback to 'Unknown Disease'
+                            imageUrl: diseases[index].diseaseImage ?? 'default_image_url', // Fallback to default image if null
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
+
 
               SizedBox(height: gapHeight1),
 
@@ -196,21 +228,57 @@ class _DiagnosePageState extends State<DiagnosePage> {
               SizedBox(height: gapHeight1),
 
               // Explore Plants Grid
-              GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: diseaseCategories.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 3 / 2,
-                ),
-                itemBuilder: (context, index) {
-                  final plant = diseaseCategories[index];
-                  return DiseaseCategoryCard(
-                    imageUrl: plant['image']!,
-                    title: plant['title']!,
+              StreamBuilder<List<DiseaseTypeModel>>(
+                stream: diseaseTypeService.streamAllDiseaseTypes(),
+                builder: (context, snapshot) {
+                  // Handle loading state
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: 4, // Number of skeleton cards to show
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 3 / 2,
+                      ),
+                      itemBuilder: (context, index) => DiseaseCategorySkeletonCard(),
+                    );
+                  }
+
+                  // Handle errors
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  // Handle case when no data is returned
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No disease categories found.'));
+                  }
+
+                  // Handle case when data is available
+                  List<DiseaseTypeModel> diseaseTypes = snapshot.data!;
+                  return GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: diseaseTypes.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 3 / 2,
+                    ),
+                    itemBuilder: (context, index) {
+                      final diseaseType = diseaseTypes[index];
+
+                      return DiseaseCategoryCard(
+                        title: diseaseType.diseaseTypeName,
+                        imageUrl: diseaseType.diseases.isNotEmpty
+                            ? 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
+                            : 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
+                      );
+                    },
                   );
                 },
               )
@@ -252,7 +320,7 @@ class DiseaseCard extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             title,
-            textAlign: TextAlign.start,
+            textAlign: TextAlign.center,
             style: GoogleFonts.lora(
               fontWeight: FontWeight.w600,
               fontSize: screenWidth * 0.05,
@@ -265,3 +333,142 @@ class DiseaseCard extends StatelessWidget {
     );
   }
 }
+
+class DiseaseSkeletonCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      width: 230,
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 150,
+            width: 230,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          SizedBox(height: 8),
+          Container(
+            height: 16,
+            width: screenWidth * 0.5,
+            color: Colors.grey[300],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DiseaseCategoryCard extends StatelessWidget {
+  final String imageUrl;
+  final String title;
+
+  const DiseaseCategoryCard({
+    required this.imageUrl,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var screenWidth = ScreenSize.width(context);
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 3),
+            blurRadius: 4,
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Background image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+          ),
+          // Semi-transparent overlay
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.black.withOpacity(0.3),
+            ),
+          ),
+          Center(
+            child: Text(
+              title,
+              style: GoogleFonts.lora(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: screenWidth * 0.04,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DiseaseCategorySkeletonCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 3),
+            blurRadius: 4,
+          ),
+        ],
+        color: Colors.grey[300], // Skeleton placeholder color
+      ),
+      child: Stack(
+        children: [
+          // Background placeholder
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              color: Colors.grey[300],
+            ),
+          ),
+          // Semi-transparent overlay
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.black.withOpacity(0.1), // Slightly darker overlay
+            ),
+          ),
+          // Centered text placeholder
+          Center(
+            child: Container(
+              width: 100,
+              height: 16,
+              color: Colors.grey[400],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
