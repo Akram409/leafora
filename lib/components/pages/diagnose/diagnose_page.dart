@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_card.dart';
+import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/firebase_database_dir/models/disease.dart';
 import 'package:leafora/firebase_database_dir/models/disease_type.dart';
 import 'package:leafora/firebase_database_dir/service/disease_service.dart';
@@ -108,7 +110,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Handle 'View All' action
+                      Get.toNamed('/commonDiseaseList');
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -312,7 +314,10 @@ class DiseaseCard extends StatelessWidget {
               fit: BoxFit.cover,
               height: 150,
               width: 230,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder:(context, url) => const CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 60,
+              ),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),
@@ -396,7 +401,10 @@ class DiseaseCategoryCard extends StatelessWidget {
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
-              placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+              placeholder:(context, url) => const CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 60,
+              ),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),

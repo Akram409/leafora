@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
@@ -167,47 +168,52 @@ class PlantCategoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenWidth = ScreenSize.width(context);
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        border: Border.all(width: 1, color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: plant.plantImage!,
-              height: 60,
-              width: 60,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
+    return GestureDetector(
+      onTap: (){
+        Get.toNamed('/plantDetails',arguments: plant);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(width: 1, color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, 3),
             ),
-          ),
-          SizedBox(height: 8),
-          FittedBox(
-            child: Text(
-              plant.plantName!,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: screenWidth * 0.04,
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: plant.plantImage!,
+                height: 60,
+                width: 60,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+            SizedBox(height: 8),
+            FittedBox(
+              child: Text(
+                plant.plantName!,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: screenWidth * 0.04,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -11,6 +11,8 @@ import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_di
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_genus_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
+import 'package:leafora/components/pages/diagnose/diseases/common_disease_list.dart';
+import 'package:leafora/components/pages/diagnose/diseases/disease_details.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
 import 'package:leafora/components/pages/plants/explore_plants/explore_plants.dart';
 import 'package:leafora/components/pages/plants/plant_details/plant_details.dart';
@@ -32,7 +34,9 @@ abstract class RoutesNames {
   static const String popularArticle = '/popularArticle';
   static const String articleDetails = '/articleDetails';
   static const String plantDetails = '/plantDetails';
+  static const String diseaseDetails = '/diseaseDetails';
   static const String explorePlants = '/explorePlants';
+  static const String commonDiseaseList = '/commonDiseaseList';
   static const String myAccount = '/myAccount';
 }
 
@@ -95,6 +99,14 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.plantDetails,
           page: () =>  PlantDetails(),
+        ),
+        GetPage(
+          name: RoutesNames.diseaseDetails,
+          page: () =>  DiseaseDetails(),
+        ),
+        GetPage(
+          name: RoutesNames.commonDiseaseList,
+          page: () =>  CommonDiseaseList(),
         ),
         GetPage(
           name: RoutesNames.popularArticle,

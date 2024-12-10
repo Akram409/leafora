@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   final items = <Widget>[
     Icon(Icons.home_outlined, size: 30,color: Colors.white),
-    Icon(Icons.shield_outlined, size: 30,color: Colors.white),
+    // Icon(Icons.shield_outlined, size: 30,color: Colors.white),
     Icon(FontAwesomeIcons.userDoctor, size: 30,color: Colors.white),
     Icon(FontAwesomeIcons.plantWilt, size: 30,color: Colors.white),
     Icon(Icons.person, size: 30,color: Colors.white),
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> pages = [
     HomePages(),
-    DiagnosePage(),
+    // DiagnosePage(),
     DiagnosePage(),
     MyPlants(),
     MyAccount(),
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<String> titles = [
     'Home',
-    'Shield',
+    // 'Shield',
     'Diagnose',
     'Plants',
     'Profile',

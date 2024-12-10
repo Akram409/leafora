@@ -282,10 +282,7 @@ class _HomePagesState extends State<HomePages> {
                     itemBuilder: (context, index) {
                       final plant = plants[index];
                       return PlantCategoryItem(
-                        plant: {
-                          'title': plant.plantName!,
-                          'image': plant.plantImage!,
-                        },
+                        plant: plant,
                       );
                     },
                   );
@@ -309,8 +306,7 @@ class ArticleCard extends StatelessWidget {
     var screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () {
-        print("Article Data: ${article.toJson()}");
-        Get.to(ArticleDetails(), arguments: article.toJson());
+        Get.to(ArticleDetails(), arguments: article);
       },
       child: Container(
         width: 200,
@@ -398,7 +394,7 @@ class ArticleCardSkeleton extends StatelessWidget {
 }
 
 class PlantCategoryItem extends StatelessWidget {
-  final Map<String, String> plant;
+  final PlantModel plant;
 
   const PlantCategoryItem({required this.plant});
 
@@ -406,8 +402,7 @@ class PlantCategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("Tapped on plant category: ${plant['title']}");
-        // Example: Get.toNamed("/plantDetails", arguments: plant);
+        Example: Get.toNamed("/plantDetails", arguments: plant);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -428,7 +423,7 @@ class PlantCategoryItem extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: CachedNetworkImage(
-                imageUrl: plant['image']!,
+                imageUrl: plant.plantImage!,
                 height: 60,
                 width: 60,
                 fit: BoxFit.cover,
@@ -442,7 +437,7 @@ class PlantCategoryItem extends StatelessWidget {
             SizedBox(height: 8),
             // Plant title from dynamic data
             Text(
-              plant['title']!,
+              plant.plantName!,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
