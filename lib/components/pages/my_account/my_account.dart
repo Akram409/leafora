@@ -3,8 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:leafora/components/authentication/login_screen.dart';
-import 'package:leafora/components/shared/widgets/custom_appbar.dart';
+import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/services/auth_service.dart';
+
 
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
@@ -15,6 +16,34 @@ class MyAccount extends StatefulWidget {
 
 class _MyAccountState extends State<MyAccount> {
   final AuthService _authService = AuthService();
+  UserModel? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  // Load user data from Firebase or your service
+  Future<void> _loadCurrentUser() async {
+    try {
+      UserModel? user = await _authService.getCurrentUserData();
+      setState(() {
+        _currentUser = user;
+      });
+      // Print user details after loading
+      if (user != null) {
+        print("Current User: ${user.toJson()}");
+      } else {
+        print("No user data available.");
+      }
+    } catch (e) {
+      print("Error loading current user data: $e");
+    }
+  }
+
+
+
   // Logout function
   Future<void> _logout() async {
     try {
@@ -29,7 +58,7 @@ class _MyAccountState extends State<MyAccount> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
+  print(_currentUser.toString());
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -43,8 +72,9 @@ class _MyAccountState extends State<MyAccount> {
                 children: [
                   // Profile Image
                   GFAvatar(
-                    backgroundImage:
-                        const NetworkImage("https://via.placeholder.com/150"),
+                    backgroundImage: _currentUser?.userImage != null
+                        ? NetworkImage(_currentUser!.userImage!['url'] ?? "https://via.placeholder.com/150")
+                        : const NetworkImage("https://via.placeholder.com/150"),
                     shape: GFAvatarShape.circle,
                     size: 50,
                   ),
@@ -55,7 +85,7 @@ class _MyAccountState extends State<MyAccount> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "John Doe",
+                          _currentUser?.userName ?? "John Doe",
                           style: TextStyle(
                               fontSize: screenWidth * 0.05,
                               fontWeight: FontWeight.bold,
@@ -63,7 +93,7 @@ class _MyAccountState extends State<MyAccount> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "johndoe@example.com",
+                          _currentUser?.userEmail ?? "johndoe@example.com",
                           style: TextStyle(
                               fontSize: screenWidth * 0.04,
                               color: Colors.black54),

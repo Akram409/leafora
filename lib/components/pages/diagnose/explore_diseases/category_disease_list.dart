@@ -124,7 +124,7 @@ class CategoryDiseaseCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Get.toNamed("/diseaseDetails", arguments: disease);
+        Get.toNamed("/diseaseDetails",arguments: disease);
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 10),

@@ -360,53 +360,58 @@ class DiseaseCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenWidth = ScreenSize.width(context);
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, 3),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Background image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              placeholder:(context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
+    return GestureDetector(
+      onTap: (){
+        Get.toNamed('/categoryDiseaseList',arguments: title);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, 3),
+              blurRadius: 4,
             ),
-          ),
-          // Semi-transparent overlay
-          Container(
-            decoration: BoxDecoration(
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Background image
+            ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.black.withOpacity(0.3),
-            ),
-          ),
-          Center(
-            child: Text(
-              title,
-              style: GoogleFonts.lora(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: screenWidth * 0.04,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                height: double.infinity,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                placeholder:(context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              textAlign: TextAlign.center,
             ),
-          )
-        ],
+            // Semi-transparent overlay
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.black.withOpacity(0.3),
+              ),
+            ),
+            Center(
+              child: Text(
+                title,
+                style: GoogleFonts.lora(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: screenWidth * 0.04,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -78,6 +78,34 @@ class AuthService {
     }
   }
 
+  // Fetch current user's data from Firestore
+  Future<app_user.UserModel?> getCurrentUserData() async {
+    try {
+      // Get the current logged-in user
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        // Fetch user data from Firestore using the user's UID
+        app_user.UserModel? userModel = await _userService.getUser(user.uid);
+
+        if (userModel != null) {
+          print("Fetched User Data: $userModel");
+          return userModel;
+        } else {
+          print("User not found in Firestore.");
+          return null;
+        }
+      } else {
+        print("No user is currently logged in.");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching current user data: $e");
+      return null;
+    }
+  }
+
+
   // Check if user is logged in
   Future<User?> getCurrentUser() async {
     return _auth.currentUser;
