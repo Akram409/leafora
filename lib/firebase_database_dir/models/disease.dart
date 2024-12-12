@@ -2,6 +2,7 @@ class DiseaseModel {
   final String diseaseId;
   final String diseaseName;
   final String diseaseImage;
+  final String diseaseType;
   final Description description;
   final int? helpful;
   final int? notHelpful;
@@ -10,6 +11,7 @@ class DiseaseModel {
     required this.diseaseId,
     required this.diseaseName,
     required this.diseaseImage,
+    required this.diseaseType,
     required this.description,
     this.helpful,
     this.notHelpful,
@@ -20,6 +22,7 @@ class DiseaseModel {
       diseaseId: json['diseaseId'],
       diseaseName: json['diseaseName'],
       diseaseImage: json['diseaseImage'],
+      diseaseType: json['diseaseType'],
       description: Description.fromJson(json['description']),
       helpful: json['helpful'],
       notHelpful: json['not_helpful'],
@@ -31,6 +34,7 @@ class DiseaseModel {
     data['diseaseId'] = this.diseaseId;
     data['diseaseName'] = this.diseaseName;
     data['diseaseImage'] = this.diseaseImage;
+    data['diseaseType'] = this.diseaseType;
     data['description'] = this.description.toJson();
     data['helpful'] = this.helpful;
     data['not_helpful'] = this.notHelpful;

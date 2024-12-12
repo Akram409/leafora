@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
@@ -134,6 +135,9 @@ class DiseaseCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var screenWidth = ScreenSize.width(context);
     return GestureDetector(
+      onTap: (){
+        Get.toNamed('/categoryDiseaseList',arguments: title);
+      },
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
