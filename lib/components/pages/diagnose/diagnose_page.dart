@@ -21,31 +21,6 @@ class DiagnosePage extends StatefulWidget {
 class _DiagnosePageState extends State<DiagnosePage> {
   final DiseaseService diseaseService = DiseaseService();
   final DiseaseTypeService diseaseTypeService = DiseaseTypeService();
-  final navigationKey = GlobalKey<CurvedNavigationBarState>();
-
-  // Common Diseases Data
-  List<Map<String, String>> diseases = [
-    {
-      'title': 'Mildew',
-      'imageUrl': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Spot',
-      'imageUrl': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Rot',
-      'imageUrl': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Curl',
-      'imageUrl': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Rust',
-      'imageUrl': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-  ];
 
   // Disease Categories Data
   List<Map<String, String>> diseaseCategories = [
@@ -168,8 +143,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: DiseaseCard(
-                            title: diseases[index].diseaseName ?? 'Unknown Disease', // Fallback to 'Unknown Disease'
-                            imageUrl: diseases[index].diseaseImage ?? 'default_image_url', // Fallback to default image if null
+                            disease: diseases[index],
                           ),
                         );
                       },
@@ -203,7 +177,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Handle 'View All' action
+                     Get.toNamed('/exploreDiseaseList');
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -291,52 +265,58 @@ class _DiagnosePageState extends State<DiagnosePage> {
   }
 }
 class DiseaseCard extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+  final DiseaseModel? disease;
 
-  const DiseaseCard({required this.title, required this.imageUrl});
+  const DiseaseCard({required this.disease});
 
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    return Container(
-      width: 230,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              height: 150,
-              width: 230,
-              placeholder:(context, url) => const CustomLoader2(
-                lottieAsset: 'assets/images/loader.json',
-                size: 60,
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the disease details page with the disease data
+        Get.toNamed("/diseaseDetails", arguments: disease);
+      },
+      child: Container(
+        width: 230,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CachedNetworkImage(
+                imageUrl: disease?.diseaseImage ?? 'default_image_url', // Fallback to default image if null
+                fit: BoxFit.cover,
+                height: 150,
+                width: 230,
+                placeholder:(context, url) => const CustomLoader2(
+                  lottieAsset: 'assets/images/loader.json',
+                  size: 60,
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.lora(
-              fontWeight: FontWeight.w600,
-              fontSize: screenWidth * 0.05,
+            SizedBox(height: 8),
+            Text(
+              disease?.diseaseName ?? 'Unknown Disease', // Fallback to 'Unknown Disease'
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lora(
+                fontWeight: FontWeight.w600,
+                fontSize: screenWidth * 0.05,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class DiseaseSkeletonCard extends StatelessWidget {
   @override

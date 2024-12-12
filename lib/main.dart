@@ -13,6 +13,7 @@ import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
 import 'package:leafora/components/pages/diagnose/diseases/common_disease_list.dart';
 import 'package:leafora/components/pages/diagnose/diseases/disease_details.dart';
+import 'package:leafora/components/pages/diagnose/explore_diseases/explore_diseases_list.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
 import 'package:leafora/components/pages/plants/explore_plants/explore_plants.dart';
 import 'package:leafora/components/pages/plants/plant_details/plant_details.dart';
@@ -37,6 +38,7 @@ abstract class RoutesNames {
   static const String diseaseDetails = '/diseaseDetails';
   static const String explorePlants = '/explorePlants';
   static const String commonDiseaseList = '/commonDiseaseList';
+  static const String exploreDiseaseList = '/exploreDiseaseList';
   static const String myAccount = '/myAccount';
 }
 
@@ -107,6 +109,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.commonDiseaseList,
           page: () =>  CommonDiseaseList(),
+        ),
+        GetPage(
+          name: RoutesNames.exploreDiseaseList,
+          page: () =>  ExploreDiseasesList(),
         ),
         GetPage(
           name: RoutesNames.popularArticle,
