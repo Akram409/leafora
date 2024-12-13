@@ -93,7 +93,7 @@ class _MyAccountState extends State<MyAccount> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _currentUser?.userEmail ?? "johndoe@example.com",
+                          _currentUser?.userEmail ?? "Unknown Email",
                           style: TextStyle(
                               fontSize: screenWidth * 0.04,
                               color: Colors.black54),

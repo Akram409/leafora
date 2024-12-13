@@ -1,6 +1,6 @@
 class DiagnosisModel {
   final String diagnosisId;
-  final String diagnosisImage;
+  Map<String, String>? diagnosisImage;
   final String diagnosisResults;
   final String userId;
   final String checkAt;
@@ -16,7 +16,9 @@ class DiagnosisModel {
   factory DiagnosisModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisModel(
       diagnosisId: json['diagnosisId'],
-      diagnosisImage: json['diagnosisImage'],
+      diagnosisImage: json['diagnosisImage'] != null
+          ? Map<String, String>.from(json['diagnosisImage'])
+          : null,
       diagnosisResults: json['diagnosisResults'],
       userId: json['userId'],
       checkAt: json['checkAt'],

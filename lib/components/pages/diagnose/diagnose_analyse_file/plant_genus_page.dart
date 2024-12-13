@@ -6,11 +6,90 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
+import 'package:leafora/components/shared/widgets/custom_toast.dart';
+import 'package:leafora/components/shared/widgets/loading_indicator.dart';
+import 'package:leafora/firebase_database_dir/models/diagnosis.dart';
+import 'package:leafora/firebase_database_dir/service/diagnosis_service.dart';
+import 'package:leafora/services/auth_service.dart';
 import 'package:lottie/lottie.dart';
+import 'package:leafora/services/cloudinary_service.dart';
+import 'package:file_picker/file_picker.dart';
 
-class PlantGenusPage extends StatelessWidget {
+class PlantGenusPage extends StatefulWidget {
   const PlantGenusPage({super.key});
+  @override
+  _PlantGenusPageState createState() => _PlantGenusPageState();
+}
 
+class _PlantGenusPageState extends State<PlantGenusPage> {
+  bool _isLoading = false;
+
+  void _saveDiagnosis(
+      BuildContext context,
+      List<String> diseaseInfo,
+      PlantDiseaseDetected state,
+      ) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Get the current user
+      final authService = AuthService();
+      final user = authService.currentUser;
+
+      if (user == null) {
+        throw Exception("No user is currently logged in.");
+      }
+
+      // Create a unique ID for the diagnosis
+      final diagnosisId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Convert the list of diseaseInfo into a single string
+      final diagnosisResults = diseaseInfo.join("\n");
+
+      // Convert XFile to FilePickerResult
+      final filePickerResult = FilePickerResult([PlatformFile(
+        name: state.image.name,
+        path: state.image.path,
+        size: File(state.image.path).lengthSync(),
+      )]);
+
+      // Upload image to Cloudinary
+      dynamic imageUrl = await uploadToCloudinary(filePickerResult);
+
+      // Build the DiagnosisModel
+      final diagnosis = DiagnosisModel(
+        diagnosisId: diagnosisId,
+        diagnosisImage: imageUrl,
+        diagnosisResults: diagnosisResults,
+        userId: user.uid,
+        checkAt: DateTime.now().toIso8601String(),
+      );
+
+      // Save the diagnosis to Firestore
+      final diagnosisService = DiagnosisService();
+      await diagnosisService.createDiagnosis(diagnosis);
+
+      // Show success message
+      CustomToast.show(
+        "Diagnosis saved successfully!",
+        bgColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } catch (e) {
+      // Handle errors
+      CustomToast.show(
+        "Failed to save diagnosis: ${e.toString()}",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -220,24 +299,53 @@ class PlantGenusPage extends StatelessWidget {
   Widget _buildDiseaseResults(BuildContext context, List<String> diseaseInfo) {
     final currentState = context.read<PlantDiseaseCubit>().state;
     var screenWidth = MediaQuery.of(context).size.width;
+
+    // Ensure `currentState` is of type `PlantDiseaseDetected`
+    if (currentState is! PlantDiseaseDetected) {
+      return Center(
+        child: Text(
+          'Unexpected state: Unable to display results.',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
     return ListView(
       children: [
-        if (currentState is PlantDiseaseDetected) ...[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.file(
-              File(currentState.image.path),
-              width: MediaQuery.of(context).size.width,
-              height: 250,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
+    ClipRRect(
+    borderRadius: BorderRadius.circular(16),
+    child: Image.file(
+    File(currentState.image.path),
+    width: MediaQuery.of(context).size.width,
+    height: 250,
+    fit: BoxFit.cover,
+    ),
+    ),
+    const SizedBox(height: 16),
         Markdown(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           data: diseaseInfo.first,
+        ),
+        const SizedBox(height: 16),
+        _isLoading
+            ? CustomLoader(color: Colors.green, size: 40.0)
+            :ElevatedButton.icon(
+          icon: const Icon(Icons.save),
+          label: const Text(
+            'Save Diagnosis',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          onPressed: () => _saveDiagnosis(context, diseaseInfo, currentState),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            textStyle: const TextStyle(fontSize: 17),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            minimumSize: Size(
+              MediaQuery.of(context).size.width * 0.4,
+              50,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
