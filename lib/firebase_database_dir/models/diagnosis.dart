@@ -1,5 +1,7 @@
 class DiagnosisModel {
   final String diagnosisId;
+  final String diagnosisName;
+  final String diagnosisType;
   Map<String, String>? diagnosisImage;
   final String diagnosisResults;
   final String userId;
@@ -7,6 +9,8 @@ class DiagnosisModel {
 
   DiagnosisModel({
     required this.diagnosisId,
+    required this.diagnosisName,
+    required this.diagnosisType,
     required this.diagnosisImage,
     required this.diagnosisResults,
     required this.userId,
@@ -16,6 +20,8 @@ class DiagnosisModel {
   factory DiagnosisModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisModel(
       diagnosisId: json['diagnosisId'],
+      diagnosisName: json['diagnosisName'],
+      diagnosisType: json['diagnosisType'],
       diagnosisImage: json['diagnosisImage'] != null
           ? Map<String, String>.from(json['diagnosisImage'])
           : null,
@@ -28,6 +34,8 @@ class DiagnosisModel {
   Map<String, dynamic> toJson() {
     return {
       'diagnosisId': diagnosisId,
+      'diagnosisName': diagnosisName,
+      'diagnosisType': diagnosisType,
       'diagnosisImage': diagnosisImage,
       'diagnosisResults': diagnosisResults,
       'userId': userId,

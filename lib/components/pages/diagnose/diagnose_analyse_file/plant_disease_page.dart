@@ -26,10 +26,11 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
   bool _isLoading = false;
 
   void _saveDiagnosis(
-      BuildContext context,
-      List<String> diseaseInfo,
-      PlantDiseaseDetected state,
-      ) async {
+    BuildContext context,
+    List<String> diseaseInfo,
+    PlantDiseaseDetected state,
+    String diseaseName,
+  ) async {
     try {
       setState(() {
         _isLoading = true;
@@ -50,11 +51,13 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
       final diagnosisResults = diseaseInfo.join("\n");
 
       // Convert XFile to FilePickerResult
-      final filePickerResult = FilePickerResult([PlatformFile(
-        name: state.image.name,
-        path: state.image.path,
-        size: File(state.image.path).lengthSync(),
-      )]);
+      final filePickerResult = FilePickerResult([
+        PlatformFile(
+          name: state.image.name,
+          path: state.image.path,
+          size: File(state.image.path).lengthSync(),
+        )
+      ]);
 
       // Upload image to Cloudinary
       dynamic imageUrl = await uploadToCloudinary(filePickerResult);
@@ -62,6 +65,8 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
       // Build the DiagnosisModel
       final diagnosis = DiagnosisModel(
         diagnosisId: diagnosisId,
+        diagnosisName: diseaseName,
+        diagnosisType: "disease",
         diagnosisImage: imageUrl,
         diagnosisResults: diagnosisResults,
         userId: user.uid,
@@ -92,6 +97,11 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
     }
   }
 
+  String _extractDiseaseName(String diseaseText) {
+    final diseaseLines = diseaseText.split('\n');
+    return diseaseLines.isNotEmpty ? diseaseLines.first : "Unknown Disease";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +127,8 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
       PlantDiseaseInitial() => _buildImageUploadOptions(context),
       PlantDiseaseImageSelected() => _buildImagePreview(context, state.image),
       PlantDiseaseLoading() => _buildLoadingIndicator(context),
-      PlantDiseaseDetected() => _buildDiseaseResults(context, state.diseaseInfo),
+      PlantDiseaseDetected() =>
+        _buildDiseaseResults(context, state.diseaseInfo),
       PlantDiseaseError() => _buildErrorView(context, state.error),
     };
   }
@@ -286,9 +297,9 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
           Text(
             'Analyzing Plant Health...',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -299,7 +310,7 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
   Widget _buildDiseaseResults(BuildContext context, List<String> diseaseInfo) {
     final currentState = context.read<PlantDiseaseCubit>().state;
     var screenWidth = MediaQuery.of(context).size.width;
-
+    print("Current state: ${currentState}");
     // Ensure `currentState` is of type `PlantDiseaseDetected`
     if (currentState is! PlantDiseaseDetected) {
       return Center(
@@ -309,6 +320,10 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
         ),
       );
     }
+
+    // Extract the disease name from the first element of the `diseaseInfo` list
+    final diseaseText = diseaseInfo.first;
+    final diseaseName = _extractDiseaseName(diseaseText);
 
     return ListView(
       children: [
@@ -331,22 +346,23 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
         _isLoading
             ? CustomLoader(color: Colors.green, size: 40.0)
             : ElevatedButton.icon(
-          icon: const Icon(Icons.save),
-          label: const Text(
-            'Save Diagnosis',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          onPressed: () => _saveDiagnosis(context, diseaseInfo, currentState),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            textStyle: const TextStyle(fontSize: 17),
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            minimumSize: Size(
-              MediaQuery.of(context).size.width * 0.4,
-              50,
-            ),
-          ),
-        ),
+                icon: const Icon(Icons.save),
+                label: const Text(
+                  'Save Diagnosis',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () => _saveDiagnosis(
+                    context, diseaseInfo, currentState, diseaseName),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  textStyle: const TextStyle(fontSize: 17),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width * 0.4,
+                    50,
+                  ),
+                ),
+              ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           icon: const Icon(Icons.restart_alt_outlined),

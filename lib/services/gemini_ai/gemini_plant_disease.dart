@@ -60,6 +60,8 @@ Treat each plant diagnosis as a unique healing journey! 🌱🌟
       Content.multi([TextPart(prompt), DataPart(mimetype, imageBytes)])
     ]);
 
+
+
     return [response.text!];
   }
 }

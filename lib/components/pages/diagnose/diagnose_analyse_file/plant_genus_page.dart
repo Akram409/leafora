@@ -24,10 +24,16 @@ class PlantGenusPage extends StatefulWidget {
 class _PlantGenusPageState extends State<PlantGenusPage> {
   bool _isLoading = false;
 
+  String _extractDiseaseName(String diseaseText) {
+    final diseaseLines = diseaseText.split('\n');
+    return diseaseLines.isNotEmpty ? diseaseLines.first : "Unknown Disease";
+  }
+
   void _saveDiagnosis(
       BuildContext context,
       List<String> diseaseInfo,
       PlantDiseaseDetected state,
+      String diseaseName,
       ) async {
     try {
       setState(() {
@@ -61,6 +67,8 @@ class _PlantGenusPageState extends State<PlantGenusPage> {
       // Build the DiagnosisModel
       final diagnosis = DiagnosisModel(
         diagnosisId: diagnosisId,
+        diagnosisName: diseaseName,
+        diagnosisType: "genus",
         diagnosisImage: imageUrl,
         diagnosisResults: diagnosisResults,
         userId: user.uid,
@@ -309,7 +317,9 @@ class _PlantGenusPageState extends State<PlantGenusPage> {
         ),
       );
     }
-
+    // Extract the disease name from the first element of the `diseaseInfo` list
+    final diseaseText = diseaseInfo.first;
+    final diseaseName = _extractDiseaseName(diseaseText);
     return ListView(
       children: [
     ClipRRect(
@@ -336,7 +346,7 @@ class _PlantGenusPageState extends State<PlantGenusPage> {
             'Save Diagnosis',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          onPressed: () => _saveDiagnosis(context, diseaseInfo, currentState),
+          onPressed: () => _saveDiagnosis(context, diseaseInfo, currentState,diseaseName),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             textStyle: const TextStyle(fontSize: 17),
