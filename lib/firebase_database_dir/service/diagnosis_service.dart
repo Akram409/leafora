@@ -23,4 +23,21 @@ class DiagnosisService {
   Future<void> deleteDiagnosis(String diagnosisId) async {
     await _firestore.collection('diagnoses').doc(diagnosisId).delete();
   }
+
+  Future<List<DiagnosisModel>> getDiagnosesByUserId(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('diagnoses')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      // Convert the query result to a list of DiagnosisModel objects
+      return querySnapshot.docs.map((doc) {
+        return DiagnosisModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    } catch (e) {
+      print("Error fetching diagnoses by userId: $e");
+      return [];
+    }
+  }
 }

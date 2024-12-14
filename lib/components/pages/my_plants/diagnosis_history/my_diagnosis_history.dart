@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
+import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/firebase_database_dir/models/diagnosis.dart';
+import 'package:leafora/firebase_database_dir/service/diagnosis_service.dart';
+import 'package:leafora/services/auth_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MyDiagnosisHistory extends StatefulWidget {
@@ -11,26 +15,47 @@ class MyDiagnosisHistory extends StatefulWidget {
 }
 
 class _MyDiagnosisHistoryState extends State<MyDiagnosisHistory> {
-  final List<Map<String, String>> plants = List.generate(10, (index) {
-    return {
-      'title': 'Plant Title $index',
-      'semiTitle': 'Semi-title $index',
-      'genusName': 'Genus $index',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    };
-  });
-
+  final AuthService _authService = AuthService();
+  final DiagnosisService _diagnosisService = DiagnosisService();
+  List<DiagnosisModel> diagnosisHistory = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Simulate a loading delay
+    fetchDiagnosisHistory();
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         isLoading = false;
       });
     });
+  }
+
+  Future<void> fetchDiagnosisHistory() async {
+    try {
+      // Get the current logged-in user
+      var user = await _authService.getCurrentUser();
+      if (user != null) {
+        // Fetch diagnoses filtered by userId
+        List<DiagnosisModel> diagnoses =
+            await _diagnosisService.getDiagnosesByUserId(user.uid);
+
+        setState(() {
+          diagnosisHistory = diagnoses;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        print("No user is logged in.");
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Error fetching diagnosis history: $e");
+    }
   }
 
   @override
@@ -39,58 +64,62 @@ class _MyDiagnosisHistoryState extends State<MyDiagnosisHistory> {
       body: Skeletonizer(
         enabled: isLoading,
         enableSwitchAnimation: true,
-        child: ListView.builder(
-          itemCount: isLoading ? 5 : plants.length,
-          padding: const EdgeInsets.all(16),
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: isLoading
-                  ? BookmarkPlantCardSkeleton()
-                  : BookmarkPlantCard(
-                      title: plants[index]['title']!,
-                      semiTitle: plants[index]['semiTitle']!,
-                      genusName: plants[index]['genusName']!,
-                      imageUrl: plants[index]['imageUrl']!,
-                    ),
-            );
-          },
-        ),
+        child: diagnosisHistory.isEmpty
+            ? Center(
+                child: isLoading
+                    ? CustomLoader2(
+                        lottieAsset: 'assets/images/loader.json',
+                        size: 60,
+                      )
+                    : const Text("No Diagnosis History Found"),
+              )
+            : ListView.builder(
+                itemCount: diagnosisHistory.length,
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) {
+                  final diagnosis = diagnosisHistory[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: isLoading
+                        ? DiagnosisHistoryCardSkeleton()
+                        : DiagnosisHistoryCard(
+                            diagnosis:
+                                diagnosis,
+                            onTap: () {
+                              Get.toNamed(
+                                "/diagnosisHistoryDetails",
+                                arguments:
+                                    diagnosis,
+                              );
+                            },
+                          ),
+                  );
+                },
+              ),
       ),
     );
   }
 }
 
-class BookmarkPlantCard extends StatefulWidget {
-  final String title;
-  final String semiTitle;
-  final String genusName;
-  final String imageUrl;
+class DiagnosisHistoryCard extends StatelessWidget {
+  final DiagnosisModel diagnosis;
+  final VoidCallback onTap;
 
-  const BookmarkPlantCard({
+  const DiagnosisHistoryCard({
     Key? key,
-    required this.title,
-    required this.semiTitle,
-    required this.genusName,
-    required this.imageUrl,
+    required this.diagnosis,
+    required this.onTap,
   }) : super(key: key);
 
-  @override
-  State<BookmarkPlantCard> createState() => _BookmarkPlantCardState();
-}
-
-class _BookmarkPlantCardState extends State<BookmarkPlantCard> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
-      onTap: () {
-        Get.toNamed(
-            "/plantDetails"); // TODO : set the arguments here to see details of the plants
-      },
+      onTap: onTap,
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 10),
         elevation: 0,
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -103,48 +132,48 @@ class _BookmarkPlantCardState extends State<BookmarkPlantCard> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
-                  image: CachedNetworkImageProvider(widget.imageUrl),
+                  image: CachedNetworkImageProvider(
+                    (diagnosis.diagnosisImage != null &&
+                            diagnosis.diagnosisImage!.containsKey('url'))
+                        ? diagnosis.diagnosisImage!['url']!
+                        : 'https://via.placeholder.com/150',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(width: 22),
+            const SizedBox(width: 15),
             // Middle: Text Column
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.title,
+                    diagnosis.diagnosisName,
                     style: TextStyle(
-                      fontSize: screenWidth * 0.05,
+                      fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 5),
                   Text(
-                    widget.semiTitle,
+                    diagnosis.diagnosisType,
                     style: TextStyle(
                       fontSize: screenWidth * 0.04,
                       color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 5),
                   Text(
-                    widget.genusName,
+                    diagnosis.checkAt,
                     style: TextStyle(
-                      fontSize: screenWidth * 0.05,
+                      fontSize: screenWidth * 0.03,
                       fontStyle: FontStyle.italic,
                       color: Colors.green,
                     ),
                   ),
                 ],
               ),
-            ),
-            // Right: Arrow Icon
-            const Icon(
-              Icons.arrow_forward,
-              color: Colors.grey,
             ),
           ],
         ),
@@ -153,7 +182,7 @@ class _BookmarkPlantCardState extends State<BookmarkPlantCard> {
   }
 }
 
-class BookmarkPlantCardSkeleton extends StatelessWidget {
+class DiagnosisHistoryCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
