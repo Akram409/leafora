@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:leafora/components/authentication/splash_screen.dart';
 import 'package:leafora/components/authentication/welcome_screen.dart';
 import 'package:leafora/components/pages/article/article_details/article_details.dart';
+import 'package:leafora/components/pages/article/article_details/article_details_by_id.dart';
 import 'package:leafora/components/pages/article/popular_article_list/popular_article_list.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_disease_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_genus_page.dart';
@@ -19,6 +20,7 @@ import 'package:leafora/components/pages/my_account/my_account.dart';
 import 'package:leafora/components/pages/my_plants/diagnosis_history/diagnosis_history_details.dart';
 import 'package:leafora/components/pages/plants/explore_plants/explore_plants.dart';
 import 'package:leafora/components/pages/plants/plant_details/plant_details.dart';
+import 'package:leafora/components/pages/plants/plant_details/plant_details_by_id.dart';
 import 'package:leafora/components/pages/user/my_bookmark/my_bookmark_page.dart';
 import 'package:leafora/firebase_database_dir/firebase/firebase_options.dart';
 import 'package:leafora/layout/home_page.dart';
@@ -36,7 +38,9 @@ abstract class RoutesNames {
   static const String myBookmark = '/myBookmark';
   static const String popularArticle = '/popularArticle';
   static const String articleDetails = '/articleDetails';
+  static const String articleDetailsById = '/articleDetailsById';
   static const String plantDetails = '/plantDetails';
+  static const String plantDetailsById = '/plantDetailsById';
   static const String diseaseDetails = '/diseaseDetails';
   static const String explorePlants = '/explorePlants';
   static const String commonDiseaseList = '/commonDiseaseList';
@@ -93,6 +97,13 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.articleDetails,
           page: () =>  ArticleDetails(),
+        ),
+        GetPage(
+          name: RoutesNames.articleDetailsById,
+          page: () =>  ArticleDetailsById(),
+        ),GetPage(
+          name: RoutesNames.plantDetailsById,
+          page: () =>  PlantDetailsById(),
         ),
         GetPage(
           name: RoutesNames.diagnosisHistoryDetails,

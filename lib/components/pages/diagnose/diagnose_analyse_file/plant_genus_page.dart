@@ -389,7 +389,7 @@ class _PlantGenusPageState extends State<PlantGenusPage> {
             width: screenWidth * 0.9,
             // height: 120,
             child: Lottie.asset(
-              "assets/images/not-found.json",
+              "assets/images/nd.json",
               fit: BoxFit.cover,
               repeat: true,
             ),

@@ -5,54 +5,115 @@ import 'package:get/get.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/firebase_database_dir/models/plant.dart';
+import 'package:leafora/firebase_database_dir/service/plant_service.dart';
 import 'package:leafora/firebase_database_dir/service/user_service.dart';
 import 'package:leafora/services/auth_service.dart';
 
-class PlantDetails extends StatefulWidget {
-  const PlantDetails({super.key});
+class PlantDetailsById extends StatefulWidget {
+  const PlantDetailsById({super.key});
 
   @override
-  State<PlantDetails> createState() => _PlantDetailsState();
+  State<PlantDetailsById> createState() => _PlantDetailsByIdState();
 }
 
-class _PlantDetailsState extends State<PlantDetails> {
+class _PlantDetailsByIdState extends State<PlantDetailsById> {
   late final QuillController _descriptionController;
   late PlantModel plantData;
   bool isBookmarked = false;
   final authService = AuthService();
   final userService = UserService();
+  final plantService = PlantService();
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    plantData = Get.arguments as PlantModel;
+    String plantID = Get.arguments;
 
+    // Fetch plant details using the plant ID
+    _fetchPlantDetails(plantID);
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isLoading) return;
     authService.getCurrentUser().then((user) async {
       if (user != null) {
-        if (plantData.plantId != null) {
-          isBookmarked =
-              await userService.isPlantBookmarked(user.uid, plantData.plantId!);
-          setState(() {});
-        }
+        final bookmarked = await userService.isArticleBookmarked(
+            user.uid, plantData.plantId!);
+        setState(() {
+          isBookmarked = bookmarked;
+        });
       }
     });
+  }
 
-    List<dynamic> ops = plantData.description?.ops?.map((op) {
-          return {
-            'insert': op.insert,
-            if (op.attributes != null) 'attributes': op.attributes?.toJson(),
-          };
-        }).toList() ??
-        [];
+  Future<void> _fetchPlantDetails(String plantID) async {
+    try {
+      final plants = await plantService.getPlant(plantID);
+      if (plants != null) {
+        setState(() {
+          plantData = plants;
 
-    if (ops.isNotEmpty && !(ops.last['insert'] as String).endsWith('\n')) {
-      ops.last['insert'] = (ops.last['insert'] as String) + '\n';
+          // Initialize the Quill controller after Plants data is fetched
+          List<dynamic> ops = plantData.description?.ops?.map((op) {
+                return {
+                  'insert': op.insert,
+                  if (op.attributes != null)
+                    'attributes': op.attributes?.toJson(),
+                };
+              }).toList() ??
+              [];
+
+          if (ops.isNotEmpty &&
+              !(ops.last['insert'] as String).endsWith('\n')) {
+            ops.last['insert'] = (ops.last['insert'] as String) + '\n';
+          }
+
+          _descriptionController = QuillController(
+            document: Document.fromJson(ops),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+
+          _isLoading = false;
+
+          // Check bookmark status after article is loaded
+          _checkBookmarkStatus();
+        });
+      } else {
+        // Handle the case when Plants data is not found
+        setState(() {
+          _isLoading = false;
+        });
+        CustomToast2.show(
+          context,
+          "Plants Data not found.",
+          bgColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      CustomToast2.show(
+        context,
+        "Failed to load article: $e",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
+  }
 
-    _descriptionController = QuillController(
-      document: Document.fromJson(ops),
-      selection: const TextSelection.collapsed(offset: 0),
-    );
+  Future<void> _checkBookmarkStatus() async {
+    final user = await authService.getCurrentUser();
+    if (user != null && plantData != null) {
+      final bookmarked =
+          await userService.isArticleBookmarked(user.uid, plantData.plantId!);
+      setState(() {
+        isBookmarked = bookmarked;
+      });
+    }
   }
 
   void toggleBookmark() async {
@@ -75,8 +136,8 @@ class _PlantDetailsState extends State<PlantDetails> {
             type: "plant",
             name: plantData.plantName!,
             imageUrl: plantData.plantImage!,
-          plantScientificName: plantData.scientificName!,
-          plantGenus: plantData.genus!,
+          plantScientificName: plantData.scientificName,
+          plantGenus: plantData.genus,
         );
         CustomToast2.show(
           context,
@@ -118,6 +179,17 @@ class _PlantDetailsState extends State<PlantDetails> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CustomLoader2(
+            lottieAsset: 'assets/images/loader.json',
+            size: 80,
+          ),
+        ),
+      );
+    }
+
     TextStyle iconStyle = TextStyle(fontSize: 18, color: Colors.green);
     TextStyle headerStyle =
         TextStyle(fontSize: 20, fontWeight: FontWeight.bold);

@@ -6,51 +6,38 @@ import 'package:intl/intl.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/firebase_database_dir/models/article.dart';
+import 'package:leafora/firebase_database_dir/service/article_service.dart';
 import 'package:leafora/firebase_database_dir/service/user_service.dart';
 import 'package:leafora/services/auth_service.dart';
 
-class ArticleDetails extends StatefulWidget {
+class ArticleDetailsById extends StatefulWidget {
   @override
-  State<ArticleDetails> createState() => _ArticleDetailsState();
+  State<ArticleDetailsById> createState() => _ArticleDetailsByIdState();
 }
 
-class _ArticleDetailsState extends State<ArticleDetails> {
+class _ArticleDetailsByIdState extends State<ArticleDetailsById> {
   late final QuillController _descriptionController;
   late ArticleModel articleData;
   bool isBookmarked = false;
   final authService = AuthService();
   final userService = UserService();
+  final articleService = ArticleService();
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
-    articleData = Get.arguments as ArticleModel;
+    String articleID = Get.arguments;
 
-    authService.getCurrentUser().then((user) async {
-      if (user != null) {
-        isBookmarked = await userService.isArticleBookmarked(
-            user.uid, articleData.articleId);
-        setState(() {}); // Update the UI
-      }
-    });
-
-    // Ensure the last operation ends with a newline
-    List<dynamic> ops = articleData.description['ops'] ?? [];
-    if (ops.isNotEmpty && !(ops.last['insert'] as String).endsWith('\n')) {
-      ops.last['insert'] = (ops.last['insert'] as String) + '\n';
-    }
-
-    _descriptionController = QuillController(
-      document: Document.fromJson(ops),
-      selection: const TextSelection.collapsed(offset: 0),
-    );
+    // Fetch the article data
+    _fetchArticleData(articleID);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
+    if (_isLoading) return;
     authService.getCurrentUser().then((user) async {
       if (user != null) {
         final bookmarked = await userService.isArticleBookmarked(
@@ -60,6 +47,65 @@ class _ArticleDetailsState extends State<ArticleDetails> {
         });
       }
     });
+  }
+
+  Future<void> _fetchArticleData(String articleID) async {
+    try {
+      final article = await articleService.getArticle(articleID);
+      if (article != null) {
+        setState(() {
+          articleData = article;
+
+          // Initialize the Quill controller after article data is fetched
+          List<dynamic> ops = articleData!.description['ops'] ?? [];
+          if (ops.isNotEmpty && !(ops.last['insert'] as String).endsWith('\n')) {
+            ops.last['insert'] = (ops.last['insert'] as String) + '\n';
+          }
+
+          _descriptionController = QuillController(
+            document: Document.fromJson(ops),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+
+          _isLoading = false;
+
+          // Check bookmark status after article is loaded
+          _checkBookmarkStatus();
+        });
+      } else {
+        // Handle the case when article data is not found
+        setState(() {
+          _isLoading = false;
+        });
+        CustomToast2.show(
+          context,
+          "Article not found.",
+          bgColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      CustomToast2.show(
+        context,
+        "Failed to load article: $e",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _checkBookmarkStatus() async {
+    final user = await authService.getCurrentUser();
+    if (user != null && articleData != null) {
+      final bookmarked = await userService.isArticleBookmarked(
+          user.uid, articleData!.articleId);
+      setState(() {
+        isBookmarked = bookmarked;
+      });
+    }
   }
 
 // Bookmark sate not working after came to the already bookmarked page
@@ -123,6 +169,18 @@ class _ArticleDetailsState extends State<ArticleDetails> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CustomLoader2(
+            lottieAsset: 'assets/images/loader.json',
+            size: 80,
+          ),
+        ),
+      );
+    }
+
     final postDate = articleData.postAt;
     final formattedDate = DateFormat('MMMM d, yyyy').format(postDate);
 

@@ -29,7 +29,8 @@ class UserService {
   }
 
   Future<UserModel?> getUser(String userId) async {
-    DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+    DocumentSnapshot doc =
+        await _firestore.collection('users').doc(userId).get();
     if (doc.exists) {
       return UserModel.fromJson(doc.data() as Map<String, dynamic>);
     }
@@ -44,12 +45,34 @@ class UserService {
     await _firestore.collection('users').doc(userId).delete();
   }
 
+  Stream<List<Map<String, dynamic>>> getBookmarks(
+      String userId, String? bookmarkType) {
+    return _firestore.collection('users').doc(userId).snapshots().map((doc) {
+      if (doc.exists) {
+        List<Map<String, dynamic>> bookmarks =
+            List<Map<String, dynamic>>.from(doc['bookmarks'] ?? []);
+
+        if (bookmarkType != null) {
+          return bookmarks
+              .where((bookmark) => bookmark['bookmarkType'] == bookmarkType)
+              .toList();
+        }
+
+        return bookmarks;
+      } else {
+        return [];
+      }
+    });
+  }
+
   Future<void> addToBookmarksOrPlants({
     required String userId,
     required String id,
     required String type, // "article" or "plant"
     required String name,
     required String imageUrl,
+    required String plantScientificName,
+    required String plantGenus,
   }) async {
     try {
       final userRef = _firestore.collection('users').doc(userId);
@@ -57,12 +80,27 @@ class UserService {
       if (type == "article") {
         // Add to bookmarks
         await userRef.update({
-          'bookmarks': FieldValue.arrayUnion([{'bookmarkId': id, 'bookmarkImage': imageUrl,'bookmarkName': name,'bookmarkType': 'article'}])
+          'bookmarks': FieldValue.arrayUnion([
+            {
+              'bookmarkId': id,
+              'bookmarkImage': imageUrl,
+              'bookmarkName': name,
+              'bookmarkType': 'article'
+            }
+          ])
         });
-      }
-      else if (type == "plant") {
+      } else if (type == "plant") {
         await userRef.update({
-          'bookmarks': FieldValue.arrayUnion([{'bookmarkId': id, 'bookmarkImage': imageUrl,'bookmarkName': name,'bookmarkType': 'plant'}])
+          'bookmarks': FieldValue.arrayUnion([
+            {
+              'bookmarkId': id,
+              'bookmarkImage': imageUrl,
+              'bookmarkName': name,
+              'bookmarkType': 'plant',
+              'plantScientificName': plantScientificName,
+              'plantGenus': plantGenus
+            }
+          ])
         });
       } else {
         throw Exception("Invalid type. Must be 'article' or 'plant'.");
@@ -79,6 +117,8 @@ class UserService {
     required String type, // "article" or "plant"
     required String name,
     required String imageUrl,
+    String? plantScientificName,
+    String? plantGenus,
   }) async {
     try {
       final userRef = _firestore.collection('users').doc(userId);
@@ -86,13 +126,30 @@ class UserService {
       if (type == "article") {
         // Remove from bookmarks
         await userRef.update({
-          'bookmarks': FieldValue.arrayRemove([{'bookmarkId': id, 'bookmarkImage': imageUrl,'bookmarkName': name,'bookmarkType': 'article'}])
+          'bookmarks': FieldValue.arrayRemove([
+            {
+              'bookmarkId': id,
+              'bookmarkImage': imageUrl,
+              'bookmarkName': name,
+              'bookmarkType': 'article'
+            }
+          ])
         });
         print("Article ID removed from bookmarks for user: $userId");
       } else if (type == "plant") {
         // Remove from myPlants
+        print(id);
         await userRef.update({
-          'bookmarks': FieldValue.arrayRemove([{'bookmarkId': id, 'bookmarkImage': imageUrl,'bookmarkName': name,'bookmarkType': 'plant'}])
+          'bookmarks': FieldValue.arrayRemove([
+            {
+              'bookmarkId': id,
+              'bookmarkImage': imageUrl,
+              'bookmarkName': name,
+              'bookmarkType': 'plant',
+              'plantScientificName': plantScientificName,
+              'plantGenus': plantGenus
+            }
+          ])
         });
         print("Plant ID removed from myPlants for user: $userId");
       } else {
@@ -108,7 +165,8 @@ class UserService {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (userDoc.exists) {
-        final bookmarks = List<Map<String, dynamic>>.from(userDoc['bookmarks'] ?? []);
+        final bookmarks =
+            List<Map<String, dynamic>>.from(userDoc['bookmarks'] ?? []);
         return bookmarks.any((bookmark) => bookmark['bookmarkId'] == articleId);
       }
       return false;
@@ -122,7 +180,8 @@ class UserService {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (userDoc.exists) {
-        final plants = List<Map<String, dynamic>>.from(userDoc['bookmarks'] ?? []);
+        final plants =
+            List<Map<String, dynamic>>.from(userDoc['bookmarks'] ?? []);
         return plants.any((plant) => plant['bookmarkId'] == plantId);
       }
       return false;
@@ -131,6 +190,4 @@ class UserService {
       return false;
     }
   }
-
-
 }
