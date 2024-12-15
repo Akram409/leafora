@@ -3,9 +3,11 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/firebase_database_dir/models/article.dart';
+import 'package:leafora/firebase_database_dir/service/user_service.dart';
+import 'package:leafora/services/auth_service.dart';
 
 class ArticleDetails extends StatefulWidget {
   @override
@@ -15,12 +17,23 @@ class ArticleDetails extends StatefulWidget {
 class _ArticleDetailsState extends State<ArticleDetails> {
   late final QuillController _descriptionController;
   late ArticleModel articleData;
+  bool isBookmarked = false;
+  final authService = AuthService();
+  final userService = UserService();
 
   @override
   void initState() {
     super.initState();
 
     articleData = Get.arguments as ArticleModel;
+
+    authService.getCurrentUser().then((user) async {
+      if (user != null) {
+        isBookmarked = await userService.isArticleBookmarked(
+            user.uid, articleData.articleId);
+        setState(() {}); // Update the UI
+      }
+    });
 
     // Ensure the last operation ends with a newline
     List<dynamic> ops = articleData.description['ops'] ?? [];
@@ -33,69 +46,123 @@ class _ArticleDetailsState extends State<ArticleDetails> {
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
+    authService.getCurrentUser().then((user) async {
+      if (user != null) {
+        final bookmarked = await userService.isArticleBookmarked(user.uid, articleData.articleId);
+        setState(() {
+          isBookmarked = bookmarked;
+        });
+      }
+    });
+  }
+// Bookmark sate not working after came to the already bookmarked page
+  void toggleBookmark() async {
+    final user = await authService.getCurrentUser();
+    if (user == null) {
+      CustomToast2.show(
+        context,
+        "Please log in to bookmark articles.",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
 
-  // final Map<String, dynamic> articleData = {
-  //   "articleImage": "https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg",
-  //   "title": "Unlock the Secrets of Succulents: Care Tips for Beginners",
-  //   "semi_title": "Rose Care 101",
-  //   "description": {
-  //     "ops": [
-  //       {
-  //         "insert": "How to Grow Roses\n",
-  //         "attributes": {"bold": true, "header": 1}
-  //       },
-  //       {
-  //         "insert": "Introduction\n",
-  //         "attributes": {"bold": true, "header": 2}
-  //       },
-  //       {
-  //         "insert": "Roses are one of the most popular flowers in the world, known for their beauty and fragrance. Growing roses can be a rewarding experience, but it requires proper care and attention.\n\n"
-  //       },
-  //       {
-  //         "insert": "Step 1: Choose the Right Variety\n",
-  //         "attributes": {"bold": true, "header": 3}
-  //       },
-  //       {
-  //         "insert": "Different rose varieties thrive in different climates. Research and select a type suitable for your region and purpose (e.g., garden roses, climbing roses, or miniature roses).\n\n"
-  //       },
-  //       {
-  //         "insert": "Step 2: Prepare the Soil\n",
-  //         "attributes": {"bold": true, "header": 3}
-  //       },
-  //       {
-  //         "insert": "Roses prefer well-drained, loamy soil with a pH level of 6.5. Enrich the soil with compost or organic matter to provide essential nutrients.\n\n"
-  //       },
-  //       {
-  //         "insert": "Care Tips\n",
-  //         "attributes": {"bold": true, "header": 2}
-  //       },
-  //       {
-  //         "insert": "Watering: Keep the soil consistently moist but avoid overwatering.\nFertilizing: Feed your roses monthly during the growing season with a balanced fertilizer.\nPruning: Remove dead or weak stems to promote healthy growth.\n"
-  //       },
-  //       {
-  //         "insert": "\nConclusion\n",
-  //         "attributes": {"bold": true, "header": 2}
-  //       },
-  //       {
-  //         "insert": "With proper care, roses can bring vibrant colors and delightful scents to your garden. Enjoy the process and watch your roses flourish!\n"
-  //       }
-  //     ]
-  //   },
-  //   "articleId": "A334455",
-  //   "authorImage": "https://i.ibb.co/WHz0bWq/pngwing-com.png",
-  //   "authorId": "U221161",
-  //   "authorName": "John Doe",
-  //   "post_at": "2024-11-25T10:00:00Z"
-  // };
+    try {
+      if (isBookmarked) {
+        await userService.removeFromBookmarksOrPlants(
+            userId: user.uid,
+            id: articleData.articleId,
+            type: "article",
+            name: articleData.title,
+            imageUrl: articleData.articleImage);
+        CustomToast2.show(
+          context,
+          "Bookmark removed!",
+          bgColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } else {
+        await userService.addToBookmarksOrPlants(
+            userId: user.uid,
+            id: articleData.articleId,
+            type: "article",
+            name: articleData.title,
+            imageUrl: articleData.articleImage);
+        CustomToast2.show(
+          context,
+          "Article bookmarked!",
+          bgColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
+
+      setState(() {
+        isBookmarked = !isBookmarked; // Toggle state
+      });
+    } catch (e) {
+      CustomToast2.show(
+        context,
+        "Failed to update bookmark: $e",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     final postDate = articleData.postAt;
     final formattedDate = DateFormat('MMMM d, yyyy').format(postDate);
 
     return Scaffold(
-      appBar: CustomAppBar4(title: "Article"),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        leadingWidth: screenWidth * 0.10,
+        title: Center(
+          child: Text(
+            "Article Details",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'RobotoMono',
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined, color: Colors.black),
+            onPressed: () {
+              // Bookmark button action
+            },
+          ),
+          IconButton(
+            mouseCursor: SystemMouseCursors.click,
+            icon: Icon(
+              size: 30,
+              isBookmarked
+                  ? Icons.bookmark_added_rounded
+                  : Icons.bookmark_add_outlined,
+              color: isBookmarked ? Colors.green : Colors.black,
+            ),
+            onPressed: toggleBookmark,
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,8 +198,8 @@ class _ArticleDetailsState extends State<ArticleDetails> {
                   Text(
                     articleData.title,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
 
                   const SizedBox(height: 16),
@@ -173,14 +240,13 @@ class _ArticleDetailsState extends State<ArticleDetails> {
 
                   const SizedBox(height: 16),
 
-                  Divider(color: Colors.black,thickness: 1,),
-                  Text(
-                    "Was this helpful?",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16
-                    )
+                  Divider(
+                    color: Colors.black,
+                    thickness: 1,
                   ),
+                  Text("Was this helpful?",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -196,10 +262,13 @@ class _ArticleDetailsState extends State<ArticleDetails> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white, // White background
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8), // Rounded corners
-                            side: BorderSide(color: Colors.black), // Black border
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                            side:
+                                BorderSide(color: Colors.black), // Black border
                           ),
-                          elevation: 0, // Optional: remove shadow for a flat look
+                          elevation:
+                              0, // Optional: remove shadow for a flat look
                         ),
                         child: Text(
                           "Yes",
@@ -232,7 +301,6 @@ class _ArticleDetailsState extends State<ArticleDetails> {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ],

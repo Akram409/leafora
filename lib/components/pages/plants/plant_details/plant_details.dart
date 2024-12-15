@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
+import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/firebase_database_dir/models/plant.dart';
+import 'package:leafora/firebase_database_dir/service/user_service.dart';
+import 'package:leafora/services/auth_service.dart';
 
 class PlantDetails extends StatefulWidget {
   const PlantDetails({super.key});
@@ -17,42 +18,148 @@ class PlantDetails extends StatefulWidget {
 class _PlantDetailsState extends State<PlantDetails> {
   late final QuillController _descriptionController;
   late PlantModel plantData;
+  bool isBookmarked = false;
+  final authService = AuthService();
+  final userService = UserService();
 
   @override
   void initState() {
     super.initState();
-
-    // Get the plant data passed from the previous screen
     plantData = Get.arguments as PlantModel;
 
-    // Ensure the last operation ends with a newline
+    authService.getCurrentUser().then((user) async {
+      if (user != null) {
+        if (plantData.plantId != null) {
+          isBookmarked =
+              await userService.isPlantBookmarked(user.uid, plantData.plantId!);
+          setState(() {});
+        }
+      }
+    });
+
     List<dynamic> ops = plantData.description?.ops?.map((op) {
-      return {
-        'insert': op.insert,
-        if (op.attributes != null) 'attributes': op.attributes?.toJson(),
-      };
-    }).toList() ?? [];
+          return {
+            'insert': op.insert,
+            if (op.attributes != null) 'attributes': op.attributes?.toJson(),
+          };
+        }).toList() ??
+        [];
 
     if (ops.isNotEmpty && !(ops.last['insert'] as String).endsWith('\n')) {
       ops.last['insert'] = (ops.last['insert'] as String) + '\n';
     }
 
-    // Initialize QuillController for displaying the description
     _descriptionController = QuillController(
       document: Document.fromJson(ops),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
 
+  void toggleBookmark() async {
+    final user = await authService.getCurrentUser();
+    if (user == null) {
+      CustomToast2.show(
+        context,
+        "Please log in to bookmark Plants.",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      if (isBookmarked) {
+        await userService.removeFromBookmarksOrPlants(
+            userId: user.uid,
+            id: plantData.plantId!,
+            type: "plant",
+            name: plantData.plantName!,
+            imageUrl: plantData.plantImage!);
+        CustomToast2.show(
+          context,
+          "Plant removed!",
+          bgColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } else {
+        await userService.addToBookmarksOrPlants(
+            userId: user.uid,
+            id: plantData.plantId!,
+            type: "plant",
+            name: plantData.plantName!,
+            imageUrl: plantData.plantImage!);
+        CustomToast2.show(
+          context,
+          "Plant bookmarked!",
+          bgColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
+
+      setState(() {
+        isBookmarked = !isBookmarked;
+      });
+    } catch (e) {
+      CustomToast2.show(
+        context,
+        "Failed to update bookmark: $e",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     TextStyle iconStyle = TextStyle(fontSize: 18, color: Colors.green);
-    TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
+    TextStyle headerStyle =
+        TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
     TextStyle bodyStyle = TextStyle(fontSize: 16, color: Colors.black87);
 
     return Scaffold(
-      appBar: CustomAppBar4(title: "Plant Details"),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        leadingWidth: screenWidth * 0.10,
+        title: Center(
+          child: Text(
+            "Plant Details",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'RobotoMono',
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined, color: Colors.black),
+            onPressed: () {
+              // Bookmark button action
+            },
+          ),
+          IconButton(
+            mouseCursor: SystemMouseCursors.click,
+            icon: Icon(
+              size: 30,
+              isBookmarked
+                  ? Icons.bookmark_added_rounded
+                  : Icons.bookmark_add_outlined,
+              color: isBookmarked ? Colors.green : Colors.black,
+            ),
+            onPressed: toggleBookmark,
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -65,7 +172,8 @@ class _PlantDetailsState extends State<PlantDetails> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: CachedNetworkImage(
-                  imageUrl: plantData.plantImage ?? 'https://via.placeholder.com/250',
+                  imageUrl:
+                      plantData.plantImage ?? 'https://via.placeholder.com/250',
                   fit: BoxFit.cover,
                   height: 250,
                   width: double.infinity,
@@ -199,13 +307,8 @@ class _PlantDetailsState extends State<PlantDetails> {
               Divider(
                 thickness: 1,
               ),
-              Text(
-                  "Was this helpful?",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16
-                  )
-              ),
+              Text("Was this helpful?",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -221,7 +324,8 @@ class _PlantDetailsState extends State<PlantDetails> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // White background
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8), // Rounded corners
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
                         side: BorderSide(color: Colors.black), // Black border
                       ),
                       elevation: 0, // Optional: remove shadow for a flat look
@@ -257,10 +361,8 @@ class _PlantDetailsState extends State<PlantDetails> {
                       ),
                     ),
                   ),
-
                 ],
               ),
-
             ],
           ),
         ),

@@ -54,7 +54,7 @@ class _MyPlantsState extends State<MyPlants> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "Plants",
+                            "My Posts",
                             style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500, ),
                           ),
                         ],
