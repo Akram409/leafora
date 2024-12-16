@@ -17,6 +17,7 @@ import 'package:leafora/components/pages/diagnose/diseases/disease_details.dart'
 import 'package:leafora/components/pages/diagnose/explore_diseases/category_disease_list.dart';
 import 'package:leafora/components/pages/diagnose/explore_diseases/explore_diseases_list.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
+import 'package:leafora/components/pages/my_account/payment_methods/payment_method_page.dart';
 import 'package:leafora/components/pages/my_plants/diagnosis_history/diagnosis_history_details.dart';
 import 'package:leafora/components/pages/plants/explore_plants/explore_plants.dart';
 import 'package:leafora/components/pages/plants/plant_details/plant_details.dart';
@@ -48,6 +49,7 @@ abstract class RoutesNames {
   static const String categoryDiseaseList = '/categoryDiseaseList';
   static const String diagnosisHistoryDetails = '/diagnosisHistoryDetails';
   static const String myAccount = '/myAccount';
+  static const String paymentMethod = '/paymentMethod';
 }
 
 void main() async{
@@ -112,6 +114,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.myAccount,
           page: () =>  MyAccount(),
+        ),
+        GetPage(
+          name: RoutesNames.paymentMethod,
+          page: () =>  PaymentMethodPage(),
         ),
         GetPage(
           name: RoutesNames.explorePlants,

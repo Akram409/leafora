@@ -6,7 +6,6 @@ import 'package:leafora/components/authentication/login_screen.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/services/auth_service.dart';
 
-
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
 
@@ -42,8 +41,6 @@ class _MyAccountState extends State<MyAccount> {
     }
   }
 
-
-
   // Logout function
   Future<void> _logout() async {
     try {
@@ -58,7 +55,7 @@ class _MyAccountState extends State<MyAccount> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-  print(_currentUser.toString());
+    print(_currentUser.toString());
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -73,7 +70,8 @@ class _MyAccountState extends State<MyAccount> {
                   // Profile Image
                   GFAvatar(
                     backgroundImage: _currentUser?.userImage != null
-                        ? NetworkImage(_currentUser!.userImage!['url'] ?? "https://via.placeholder.com/150")
+                        ? NetworkImage(_currentUser!.userImage!['url'] ??
+                            "https://via.placeholder.com/150")
                         : const NetworkImage("https://via.placeholder.com/150"),
                     shape: GFAvatarShape.circle,
                     size: 50,
@@ -171,19 +169,23 @@ class _MyAccountState extends State<MyAccount> {
               buildSection(
                   icon: Icons.person_outline,
                   title: "My Account",
-                  screenWidth: screenWidth),
+                  screenWidth: screenWidth,
+                  path: ""),
               buildSection(
                   icon: Icons.receipt_long_outlined,
                   title: "Billing & Subscription",
-                  screenWidth: screenWidth),
+                  screenWidth: screenWidth,
+                  path: ""),
               buildSection(
                   icon: Icons.payment_outlined,
                   title: "Payment Methods",
-                  screenWidth: screenWidth),
+                  screenWidth: screenWidth,
+                  path: "paymentMethod"),
               buildSection(
                   icon: Icons.info_outline,
                   title: "About Us",
-                  screenWidth: screenWidth),
+                  screenWidth: screenWidth,
+                  path: ""),
 
               // Logout Button
               ListTile(
@@ -212,7 +214,8 @@ class _MyAccountState extends State<MyAccount> {
   Widget buildSection(
       {required IconData icon,
       required String title,
-      required double screenWidth}) {
+      required double screenWidth,
+      required String path}) {
     return ListTile(
       leading: Icon(
         icon,
@@ -231,7 +234,7 @@ class _MyAccountState extends State<MyAccount> {
         color: Colors.black54,
       ),
       onTap: () {
-        // Handle navigation or actions here
+        Get.toNamed(path);
       },
     );
   }
