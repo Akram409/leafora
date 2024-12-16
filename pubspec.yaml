@@ -78,7 +78,7 @@ dependencies:
 #  payment gateway
   bkash: ^0.0.2
   uddoktapay: ^0.0.4
-  flutter_sslcommerz: ^2.3.6
+#  flutter_sslcommerz: ^2.3.6
   shurjopay: ^2.0.6
 
 

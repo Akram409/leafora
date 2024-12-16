@@ -1,10 +1,6 @@
 import 'dart:convert';
 import 'package:bkash/bkash.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_sslcommerz/model/SSLCSdkType.dart';
-import 'package:flutter_sslcommerz/model/SSLCommerzInitialization.dart';
-import 'package:flutter_sslcommerz/model/SSLCurrencyType.dart';
-import 'package:flutter_sslcommerz/sslcommerz.dart';
 import 'package:get/get.dart';
 import 'package:uddoktapay/models/customer_model.dart';
 import 'package:uddoktapay/models/request_response.dart';
@@ -22,15 +18,15 @@ void paymentHelper(String selected) async {
       break;
 
     case 'uddoktapay':
-      // uddoktapay();
+      uddoktapay();
       break;
 
     case 'sslcommerz':
-      // sslcommerz();
+      sslcommerz();
       break;
 
     case 'shurjopay':
-      // shurjoPay();
+      shurjoPay();
       break;
 
     default:
@@ -97,36 +93,36 @@ void uddoktapay() async {
 
 /// SslCommerz
 void sslcommerz() async {
-  Sslcommerz sslcommerz = Sslcommerz(
-    initializer: SSLCommerzInitialization(
-      multi_card_name: "visa,master,bkash", // name of payment method name here
-      currency: SSLCurrencyType.BDT, // BDT for bangladesh currency
-      product_category: "Digital Product",
-      sdkType: SSLCSdkType.TESTBOX, // for testing
-      // sdkType: SSLCSdkType.LIVE, // for live
-      store_id: dotenv.env['SSL_PAYMENT_STORE_ID']!,
-      store_passwd: dotenv.env['SSL_PAYMENT_STORE_PASS']!,
-      total_amount: totalPrice,
-      tran_id: "TestTRX001", // Custom Transaction id provide here
-    ),
-  );
-
-  final response = await sslcommerz.payNow();
-
-  if (response.status == 'VALID') {
-    print(jsonEncode(response));
-
-    print('Payment completed, TRX ID: ${response.tranId}');
-    print(response.tranDate);
-  }
-
-  if (response.status == 'Closed') {
-    print('Payment closed');
-  }
-
-  if (response.status == 'FAILED') {
-    print('Payment failed');
-  }
+  // Sslcommerz sslcommerz = Sslcommerz(
+  //   initializer: SSLCommerzInitialization(
+  //     multi_card_name: "visa,master,bkash", // name of payment method name here
+  //     currency: SSLCurrencyType.BDT, // BDT for bangladesh currency
+  //     product_category: "Digital Product",
+  //     sdkType: SSLCSdkType.TESTBOX, // for testing
+  //     // sdkType: SSLCSdkType.LIVE, // for live
+  //     store_id: dotenv.env['SSL_PAYMENT_STORE_ID']!,
+  //     store_passwd: dotenv.env['SSL_PAYMENT_STORE_PASS']!,
+  //     total_amount: totalPrice,
+  //     tran_id: "TestTRX001", // Custom Transaction id provide here
+  //   ),
+  // );
+  //
+  // final response = await sslcommerz.payNow();
+  //
+  // if (response.status == 'VALID') {
+  //   print(jsonEncode(response));
+  //
+  //   print('Payment completed, TRX ID: ${response.tranId}');
+  //   print(response.tranDate);
+  // }
+  //
+  // if (response.status == 'Closed') {
+  //   print('Payment closed');
+  // }
+  //
+  // if (response.status == 'FAILED') {
+  //   print('Payment failed');
+  // }
 }
 
 // TODO: initialize this: initializeShurjopay(environment: 'sandbox'); in -> main.dart file

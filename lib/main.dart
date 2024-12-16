@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -55,6 +56,9 @@ abstract class RoutesNames {
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  //enter full-screen
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   await dotenv.load(fileName: ".env");
   // Initialize Firebase
   try {
