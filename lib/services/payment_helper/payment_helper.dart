@@ -130,7 +130,7 @@ void sslcommerz() async {
 }
 
 // TODO: initialize this: initializeShurjopay(environment: 'sandbox'); in -> main.dart file
-void shurjoPay() async {
+void shurjoPay() async  {
   final shurjoPay = ShurjoPay();
 
   final paymentResponse = await shurjoPay.makePayment(
