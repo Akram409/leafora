@@ -77,9 +77,9 @@ dependencies:
   flutter_quill: ^10.8.5
 #  payment gateway
   bkash: ^0.0.2
-#  uddoktapay: ^0.0.4
-#  flutter_sslcommerz: ^2.3.6
-#  shurjopay: ^2.0.6
+  uddoktapay: ^0.0.4
+  flutter_sslcommerz: ^2.3.6
+  shurjopay: ^2.0.6
 
 
 

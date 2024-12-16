@@ -241,6 +241,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "5598aa796bbf4699afd5c67c0f5f6e2ed542afc956884b9cd58c306966efc260"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.7.0"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "33259a9276d6cea88774a0000cfae0d861003497755969c92faa223108620dc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   equatable:
     dependency: "direct main"
     description:
@@ -579,6 +595,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+  flutter_sslcommerz:
+    dependency: "direct main"
+    description:
+      name: flutter_sslcommerz
+      sha256: "687f267ba34a579cdc96cbb286a5a1e030cb08d6b49e3d7771fd0186ab9da8b2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.6"
   flutter_svg:
     dependency: transitive
     description:
@@ -629,6 +653,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.6"
+  get_it:
+    dependency: transitive
+    description:
+      name: get_it
+      sha256: d85128a5dae4ea777324730dc65edd9c9f43155c109d5cc0a69cab74139fbac1
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.7.0"
   getwidget:
     dependency: "direct main"
     description:
@@ -1197,6 +1229,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
+  shurjopay:
+    dependency: "direct main"
+    description:
+      name: shurjopay
+      sha256: "52cebb1650badf58065ce6b0af8f47498e756c357f281ac99b20630bfe168190"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.6"
   skeletonizer:
     dependency: "direct main"
     description:
@@ -1330,6 +1370,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  uddoktapay:
+    dependency: "direct main"
+    description:
+      name: uddoktapay
+      sha256: "47d88e5107dac4bccf61c7a860f3f674bb8b804c520a788ec1dcf4306dbe2622"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   url_launcher:
     dependency: "direct main"
     description:
@@ -1454,18 +1502,18 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter
-      sha256: "889a0a678e7c793c308c68739996227c9661590605e70b1f6cf6b9a6634f7aec"
+      sha256: ec81f57aa1611f8ebecf1d2259da4ef052281cb5ad624131c93546c79ccc7736
       url: "https://pub.dev"
     source: hosted
-    version: "4.10.0"
+    version: "4.9.0"
   webview_flutter_android:
     dependency: transitive
     description:
       name: webview_flutter_android
-      sha256: "3d535126f7244871542b2f0b0fcf94629c9a14883250461f9abe1a6644c1c379"
+      sha256: "47a8da40d02befda5b151a26dba71f47df471cddd91dfdb7802d0a87c5442558"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "3.16.9"
   webview_flutter_platform_interface:
     dependency: transitive
     description:
