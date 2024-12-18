@@ -12,6 +12,13 @@ class UserModel {
   String? otp;
   String? fcmToken;
   String? role;
+  late String? isOnline;
+  late String? lastActive;
+  late String? about;
+  int? credits; // Number of credits remaining
+  DateTime? lastCreditReset; // Last reset date
+  List<String>? selectedPaymentMethods; // List of selected payment methods
+  List<String>? paymentHistory; // List of past payment transactions
   List<String>? notification;
   List<String>? bookmarks;
   List<MyPlants>? myPlants;
@@ -32,6 +39,13 @@ class UserModel {
     this.otp,
     this.fcmToken,
     this.role,
+    this.isOnline,
+    this.about,
+    this.lastActive,
+    this.credits,
+    this.lastCreditReset,
+    this.selectedPaymentMethods,
+    this.paymentHistory,
     this.notification,
     this.bookmarks,
     this.myPlants,
@@ -56,6 +70,13 @@ class UserModel {
       otp: json['otp'],
       fcmToken: json['fcm_token'],
       role: json['role'],
+        isOnline: json['isOnline'] != null ? json['isOnline'].toString() : null,
+      about: json['about'] ?? '',
+      lastActive: json['lastActive'] ?? '',
+      credits: json['credits'],
+      lastCreditReset: json['lastCreditReset'],
+      selectedPaymentMethods: json['selectedPaymentMethods']?.cast<String>(),
+      paymentHistory: json['paymentHistory']?.cast<String>(),
       notification: json['notification']?.cast<String>(),
       bookmarks: json['bookmarks']?.cast<String>(),
       myPlants: json['my_plants'] != null
@@ -83,6 +104,13 @@ class UserModel {
     data['otp'] = otp;
     data['fcm_token'] = fcmToken;
     data['role'] = role;
+    data['isOnline'] = isOnline;
+    data['about'] = about;
+    data['lastActive'] = lastActive;
+    data['credits'] = credits;
+    data['lastCreditReset'] = lastCreditReset?.toIso8601String();
+    data['selectedPaymentMethods'] = selectedPaymentMethods;
+    data['paymentHistory'] = paymentHistory;
     data['notification'] = notification;
     data['bookmarks'] = bookmarks;
     if (myPlants != null) {

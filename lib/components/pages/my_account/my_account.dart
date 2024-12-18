@@ -32,7 +32,7 @@ class _MyAccountState extends State<MyAccount> {
       });
       // Print user details after loading
       if (user != null) {
-        print("Current User: ${user.toJson()}");
+        // print("Current User: ${user.toJson()}");
       } else {
         print("No user data available.");
       }

@@ -78,6 +78,11 @@ class AuthService {
     }
   }
 
+  String? get userId {
+    return FirebaseAuth.instance.currentUser?.uid;
+  }
+
+
   // Fetch current user's data from Firestore
   Future<app_user.UserModel?> getCurrentUserData() async {
     try {
@@ -89,7 +94,7 @@ class AuthService {
         app_user.UserModel? userModel = await _userService.getUser(user.uid);
 
         if (userModel != null) {
-          print("Fetched User Data: $userModel");
+          // print("Fetched User Data: $userModel");
           return userModel;
         } else {
           print("User not found in Firestore.");

@@ -73,7 +73,12 @@ void main() async{
   await NotificationService.instance.initialize();
   // initializeShurjopay(environment: 'sandbox');
 
-  runApp(const MyApp());
+  //for setting orientation to portrait only
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+      .then((value) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

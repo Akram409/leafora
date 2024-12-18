@@ -36,7 +36,7 @@ class _SplashState extends State<Splash> {
       if (hasSeenOnboarding) {
         if (user != null) {
           String? role = await _authService.getUserRole(user.uid);
-          print("her role is: ${role}");
+          // print("her role is: ${role}");
           if (role != null) {
             switch (role) {
               case 'admin':
