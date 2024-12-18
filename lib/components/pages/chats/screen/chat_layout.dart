@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +7,7 @@ import 'package:leafora/components/pages/chats/widget/profile_image.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
 import 'package:leafora/services/auth_service.dart';
-import 'package:leafora/services/lifecycle_event_handler.dart';
 import 'package:lottie/lottie.dart';
-import 'package:get/get.dart';
 
 //home screen -- where all available contacts are shown
 class ChatLayout extends StatefulWidget {
@@ -134,7 +130,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                 setState(() => _searchList);
               },
             )
-                : const Text('We Chat'),
+                : const Text('Lefora'),
 
             actions: [
               //search user button

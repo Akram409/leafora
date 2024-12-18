@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           color: Colors.green,
           buttonBackgroundColor: Colors.green,
           index: currentIndex,
-          height: 70,
+          height: 75,
           animationCurve: Curves.easeInOut,
           // animationDuration: Duration(microseconds: 400),
           items: items,

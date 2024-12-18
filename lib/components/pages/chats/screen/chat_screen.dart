@@ -1,14 +1,17 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafora/components/pages/chats/widget/message_card.dart';
 import 'package:leafora/components/pages/chats/widget/profile_image.dart';
 import 'package:leafora/components/shared/utils/date_util.dart';
+import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/firebase_database_dir/models/chat_message.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
+import 'package:leafora/services/cloudinary_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserModel user;
@@ -21,6 +24,61 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final ChaMessageService chatService = ChaMessageService();
+  FilePickerResult? _filePickerResult;
+
+  void _openFilePicker() async {
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      // Pick a file from the gallery
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        allowedExtensions: ["jpg", "jpeg", "png"],
+        type: FileType.custom,
+      );
+
+      if (result != null) {
+        final File file = File(result.files.single.path!);
+
+        // Upload to Cloudinary or any service you are using
+        Map<String, String>? uploadedImage;
+        uploadedImage = await uploadToCloudinary(result);
+
+        if (uploadedImage == null) {
+          // Show error if upload fails
+          CustomToast.show(
+            "❌ Failed to upload image. Please try again.",
+            bgColor: Colors.red,
+            textColor: Colors.white,
+          );
+          setState(() {
+            _isUploading = false;
+          });
+          return;
+        }
+
+        // Call the chat service to send the image
+        await chatService.sendChatImage(widget.user, uploadedImage);
+      }
+    } catch (e) {
+      // Handle any exceptions
+      log("Error in file picker: $e");
+      CustomToast.show(
+        "❌ Something went wrong. Please try again.",
+        bgColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } finally {
+      // Reset uploading indicator
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+
   //for storing all messages
   List<ChatMessage> _list = [];
 
@@ -74,76 +132,81 @@ class _ChatScreenState extends State<ChatScreen> {
             automaticallyImplyLeading: false,
             flexibleSpace: _appBar(),
             backgroundColor: Colors.white,
+            elevation: 0,
           ),
 
           backgroundColor: const Color.fromARGB(255, 234, 248, 255),
 
           //body
           body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: StreamBuilder(
-                    stream: chatService.getAllMessages(widget.user),
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                      //if data is loading
-                        case ConnectionState.waiting:
-                        case ConnectionState.none:
-                          return const SizedBox();
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: chatService.getAllMessages(widget.user),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          //if data is loading
+                          case ConnectionState.waiting:
+                          case ConnectionState.none:
+                            return const SizedBox();
 
-                      //if some or all data is loaded then show it
-                        case ConnectionState.active:
-                        case ConnectionState.done:
-                          final data = snapshot.data?.docs;
-                          _list = data
-                              ?.map((e) => ChatMessage.fromJson(e.data()))
-                              .toList() ??
-                              [];
+                          //if some or all data is loaded then show it
+                          case ConnectionState.active:
+                          case ConnectionState.done:
+                            final data = snapshot.data?.docs;
+                            _list = data
+                                    ?.map((e) => ChatMessage.fromJson(e.data()))
+                                    .toList() ??
+                                [];
 
-                          if (_list.isNotEmpty) {
-                            return ListView.builder(
-                                reverse: true,
-                                itemCount: _list.length,
-                                padding: EdgeInsets.only(top: screenHeight * .01),
-                                physics: const BouncingScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return MessageCard(message: _list[index]);
-                                });
-                          } else {
-                            return const Center(
-                              child: Text('Say Hii! 👋',
-                                  style: TextStyle(fontSize: 20)),
-                            );
-                          }
-                      }
-                    },
-                  ),
-                ),
-
-                //progress indicator for showing uploading
-                if (_isUploading)
-                  const Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                          padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                          child: CircularProgressIndicator(strokeWidth: 2))),
-
-                //chat input filed
-                _chatInput(),
-
-                //show emojis on keyboard emoji button click & vice versa
-                if (_showEmoji)
-                  SizedBox(
-                    height: screenHeight * .35,
-                    child: EmojiPicker(
-                      key: Key("dfsd"),
-                      textEditingController: _textController,
-                      config: const Config(),
+                            if (_list.isNotEmpty) {
+                              return ListView.builder(
+                                  reverse: true,
+                                  itemCount: _list.length,
+                                  padding:
+                                      EdgeInsets.only(top: screenHeight * .01),
+                                  physics: const BouncingScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return MessageCard(message: _list[index]);
+                                  });
+                            } else {
+                              return const Center(
+                                child: Text('Say Hii! 👋',
+                                    style: TextStyle(fontSize: 20)),
+                              );
+                            }
+                        }
+                      },
                     ),
-                  )
-              ],
+                  ),
+
+                  //progress indicator for showing uploading
+                  if (_isUploading)
+                    const Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 20),
+                            child: CircularProgressIndicator(strokeWidth: 2))),
+
+                  //chat input filed
+                  _chatInput(),
+
+                  //show emojis on keyboard emoji button click & vice versa
+                  if (_showEmoji)
+                    SizedBox(
+                      height: screenHeight * .35,
+                      child: EmojiPicker(
+                        key: Key("dfsd"),
+                        textEditingController: _textController,
+                        config: const Config(),
+                      ),
+                    )
+                ],
+              ),
             ),
           ),
         ),
@@ -176,16 +239,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     //back button
                     IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.green)),
+                        icon:
+                            const Icon(Icons.arrow_back, color: Colors.green)),
 
                     //user profile picture
                     ProfileImage(
-                      size:
-                      screenWidth * .09,
+                      size: screenWidth * .1,
                       url: widget.user.userImage != null
-                          ? widget.user.userImage![
-                      'url']
+                          ? widget.user.userImage!['url']
                           : "/assets/images/profile.png",
                     ),
 
@@ -198,7 +259,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         //user name
-                        Text(list.isNotEmpty ? list[0].userName! : widget.user.userName!,
+                        Text(
+                            list.isNotEmpty
+                                ? list[0].userName!
+                                : widget.user.userName!,
                             style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
@@ -210,14 +274,14 @@ class _ChatScreenState extends State<ChatScreen> {
                         //last seen time of user
                         Text(
                           list.isNotEmpty
-                              ? list[0].isOnline == true
-                              ? 'Online'
+                              ? list[0].isOnline == "true"
+                                  ? 'Online'
+                                  : DateUtil.getLastActiveTime(
+                                      context: context,
+                                      lastActive: list[0].lastActive!)
                               : DateUtil.getLastActiveTime(
-                              context: context,
-                              lastActive: list[0].lastActive!)
-                              : DateUtil.getLastActiveTime(
-                              context: context,
-                              lastActive: widget.user.lastActive!),
+                                  context: context,
+                                  lastActive: widget.user.lastActive!),
                           style: const TextStyle(
                               fontSize: 13, color: Colors.black54),
                         ),
@@ -235,14 +299,15 @@ class _ChatScreenState extends State<ChatScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Padding(
       padding: EdgeInsets.symmetric(
-          vertical: screenHeight * .01, horizontal:screenWidth * .025),
+          vertical: screenHeight * .01, horizontal: screenWidth * .025),
       child: Row(
         children: [
           //input field & buttons
           Expanded(
             child: Card(
               shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15))),
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+              ),
               child: Row(
                 children: [
                   //emoji button
@@ -256,60 +321,46 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   Expanded(
                       child: TextField(
-                        controller: _textController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        onTap: () {
-                          if (_showEmoji) setState(() => _showEmoji = !_showEmoji);
-                        },
-                        decoration: const InputDecoration(
-                            hintText: 'Type Something...',
-                            hintStyle: TextStyle(color: Colors.green),
-                            border: InputBorder.none),
-                      )),
+                    controller: _textController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    onTap: () {
+                      if (_showEmoji) setState(() => _showEmoji = !_showEmoji);
+                    },
+                    decoration: const InputDecoration(
+                        hintText: 'Type Something...',
+                        hintStyle: TextStyle(color: Colors.green),
+                        border: InputBorder.none),
+                  )),
 
                   //pick image from gallery button
                   IconButton(
-                      onPressed: () async {
-                        final ImagePicker picker = ImagePicker();
 
-                        // Picking multiple images
-                        final List<XFile> images =
-                        await picker.pickMultiImage(imageQuality: 70);
-
-                        // uploading & sending image one by one
-                        for (var i in images) {
-                          log('Image Path: ${i.path}');
-                          setState(() => _isUploading = true);
-                          // TODO: check here enable the sendChatImage
-                          // await chatService.sendChatImage(widget.user, File(i.path));
-                          setState(() => _isUploading = false);
-                        }
-                      },
+                      onPressed: _openFilePicker,
                       icon: const Icon(Icons.image,
                           color: Colors.green, size: 26)),
 
                   //take image from camera button
-                  IconButton(
-                    onPressed: () async {
-                      final ImagePicker picker = ImagePicker();
-
-                      // Pick an image
-                      final XFile? image = await picker.pickImage(
-                          source: ImageSource.camera, imageQuality: 70);
-                      // TODO: check here enable hte sendChatImage
-                      // if (image != null) {
-                      //   log('Image Path: ${image.path}');
-                      //   setState(() => _isUploading = true);
-                      //
-                      //   await chatService.sendChatImage(
-                      //       widget.user, File(image.path));
-                      //   setState(() => _isUploading = false);
-                      // }
-                    },
-                    icon: const Icon(Icons.camera_alt_rounded, size: 26),
-                    color: Colors.green,  // Corrected to use a Color object
-                  ),
+                  // IconButton(
+                  //   onPressed: () async {
+                  //     final ImagePicker picker = ImagePicker();
+                  //
+                  //     // Pick an image
+                  //     final XFile? image = await picker.pickImage(
+                  //         source: ImageSource.camera, imageQuality: 70);
+                  //     // TODO: check here enable hte sendChatImage
+                  //     // if (image != null) {
+                  //     //   log('Image Path: ${image.path}');
+                  //     //   setState(() => _isUploading = true);
+                  //     //
+                  //     //   await chatService.sendChatImage(
+                  //     //       widget.user, File(image.path));
+                  //     //   setState(() => _isUploading = false);
+                  //     // }
+                  //   },
+                  //   icon: const Icon(Icons.camera_alt_rounded, size: 26),
+                  //   color: Colors.green, // Corrected to use a Color object
+                  // ),
 
                   //adding some space
                   SizedBox(width: screenWidth * .02),
@@ -336,10 +387,11 @@ class _ChatScreenState extends State<ChatScreen> {
             },
             minWidth: 0,
             padding:
-            const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),
+                const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),
             shape: const CircleBorder(),
             color: Colors.green,
-            child: const Icon(Icons.send_outlined, color: Colors.white, size: 25),
+            child:
+                const Icon(Icons.send_outlined, color: Colors.white, size: 25),
           )
         ],
       ),

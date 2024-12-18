@@ -298,6 +298,7 @@ class _SignupScreenState extends State<SignupScreen> {
       {bool obscureText = false}) {
     return TextFormField(
       controller: controller,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(

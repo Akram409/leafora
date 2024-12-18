@@ -66,19 +66,19 @@ void main() async{
       name: "lefora-ai",
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
   } catch (e) {
-    print('Error initializing Firebase: $e');
+    debugPrint('Error initializing Firebase: $e');
   }
   await NotificationService.instance.initialize();
   // initializeShurjopay(environment: 'sandbox');
 
   //for setting orientation to portrait only
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+
   SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
-      .then((value) {
-    runApp(const MyApp());
-  });
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

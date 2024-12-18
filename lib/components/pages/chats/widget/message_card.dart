@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -162,19 +164,22 @@ class _MessageCardState extends State<MessageCard> {
                 //show image
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment:CrossAxisAlignment.end,
               children: [
                 // Image section
-                ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.message.msg,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                Flexible(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(15)),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.message.msg,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) =>
+                      const Icon(Icons.image, size: 70),
                     ),
-                    errorWidget: (context, url, error) =>
-                    const Icon(Icons.image, size: 70),
                   ),
                 ),
                 const SizedBox(width: 5),
@@ -247,9 +252,8 @@ class _MessageCardState extends State<MessageCard> {
                       name: 'Save Image',
                       onTap: () async {
                         // try {
-                        //   log('Image Url: ${widget.message.msg}');
                         //   await GallerySaver.saveImage(widget.message.msg,
-                        //       albumName: 'We Chat')
+                        //       albumName: 'lefora')
                         //       .then((success) {
                         //     //for hiding bottom sheet
                         //     Navigator.pop(context);

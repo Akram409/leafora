@@ -3,6 +3,57 @@ import 'package:leafora/firebase_database_dir/models/user.dart';
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CollectionReference _userCollection =
+  FirebaseFirestore.instance.collection("users");
+
+  Future<String?> getUserToken(String? userId) async {
+    try {
+      final querySnapshot =
+      await _userCollection.where('userId', isEqualTo: userId).get();
+
+      // Fetch the first document and extract the `fcm_token` field
+      if (querySnapshot.docs.isNotEmpty) {
+        final docData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+        return docData?['fcm_token'] as String?;
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching user token: $e");
+      return null;
+    }
+  }
+
+
+  // Update FCM token for the user
+  Future<void> updateFcmToken(String userId, String fcmToken) async {
+    try {
+      DocumentReference userRef = _userCollection.doc(userId);
+
+      await userRef.update({
+        'fcm_token': fcmToken,
+      });
+
+      print("FCM token updated successfully for user: $userId");
+    } catch (e) {
+      print("Failed to update FCM token: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> removeInvalidToken(String? invalidToken) async {
+    try {
+      // Query for the document where the token matches
+      final querySnapshot = await _userCollection.where('fcm_token', isEqualTo: invalidToken).get();
+
+      for (var doc in querySnapshot.docs) {
+        // Remove the token field from the document
+        await doc.reference.update({'fcm_token': FieldValue.delete()});
+        print("Removed invalid token from user document: ${doc.id}");
+      }
+    } catch (e) {
+      print("Error removing invalid token: $e");
+    }
+  }
 
   Future<void> createUser(UserModel user) async {
     try {

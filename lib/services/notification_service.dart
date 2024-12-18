@@ -21,7 +21,7 @@ class NotificationService {
     await _setupMessageHandlers();
 
     final token = await _messaging.getToken();
-    print('FCM Token: $token');
+    // print('FCM Token: $token');
   }
 
   // Request notification permissions
@@ -58,7 +58,7 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: (details) {
         // Handle notification tapped
-        print('Notification tapped: ${details.payload}');
+        // print('Notification tapped: ${details.payload}');
       },
     );
 
@@ -103,20 +103,21 @@ class NotificationService {
   }
 
   // Send push notifications to multiple tokens
-  Future<void> sendPushNotification(String token, Map<String, dynamic> scheduleData) async {
+  Future<void> sendPushNotification(String token, Map<String, dynamic> notificationPayload) async {
     try {
       final String serverKey = await _getServerKey.getServerKeyToken();
-      final Uri url = Uri.parse("https://fcm.googleapis.com/v1/projects/bus-koi-6d51b/messages:send");
+      // TODO: bus koi here
+      final Uri url = Uri.parse("https://fcm.googleapis.com/v1/projects/lefora-ai/messages:send");
 
       // Construct the notification payload
       Map<String, dynamic> notificationData = {
         "message": {
           "notification": {
-            "title": "New Schedule Added",
-            "body": "A new schedule has been added. Check it now!",
+            "title": notificationPayload['title'] ?? "Notification",
+            "body": notificationPayload['body'] ?? "You have a new notification",
           },
-          "data": scheduleData,
-          "token": token, // Send to individual token
+          "data": notificationPayload['data'] ?? {},
+          "token": token,
         },
       };
 

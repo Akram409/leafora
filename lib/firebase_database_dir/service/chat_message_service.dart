@@ -8,11 +8,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:leafora/firebase_database_dir/models/chat_message.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/user_service.dart';
+import 'package:leafora/services/notification_service.dart';
 
 class ChaMessageService{
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final UserService _userService = UserService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final NotificationService _notificationService = NotificationService.instance;
   late UserModel? _currentUser;
 
   ChaMessageService() {
@@ -177,8 +179,6 @@ class ChaMessageService{
     //message sending time (also used as id)
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
-
-
     //message to send
     final ChatMessage message = ChatMessage(
         toId: chatUser.userId!,
@@ -200,6 +200,34 @@ class ChaMessageService{
      }
 
      // TODO: check here: push notification add here
+     // Send push notification to the specific user
+     final String? userToken = await _userService.getUserToken(chatUser.userId);
+     try {
+       // Get the user token
+       if (userToken != null) {
+         await _notificationService.sendPushNotification(
+           userToken,
+           {
+             "title": "New Message from ${_currentUser!.userName}",
+             "body": type == Type.text ? msg : 'Sent you an image',
+             "data": {
+               "conversationId": getConversationID(chatUser.userId!),
+               "fromId": _currentUser!.userId!,
+             },
+           },
+         );
+         log('Push notification sent successfully to token: $userToken');
+       } else {
+         log('No token found for user ${chatUser.userId}');
+       }
+     } catch (e) {
+       log('Error while sending push notification: $e');
+       // Optionally handle invalid tokens here
+       if (e.toString().contains("Invalid registration token")) {
+         await _userService.removeInvalidToken(userToken!);
+         log('Removed invalid token: $userToken');
+       }
+     }
     // await ref.doc(time).set(message.toJson()).then((value) =>
     //     sendPushNotification(chatUser, type == Type.text ? msg : 'image'));
   }
@@ -222,39 +250,14 @@ class ChaMessageService{
   }
 
   // TODO: check here: sendChat Image enable here
-  // static Future<void> sendChatImage(UserModel chatUser, File file) async {
-  //   final ext = file.path.split('.').last;
-  //
-  //   final ref = storage.ref().child(
-  //       'images/${getConversationID(chatUser.userId)}/${DateTime.now().millisecondsSinceEpoch}.$ext');
-  //
-  //   await ref.putFile(file, SettableMetadata(contentType: 'image/$ext')).then((p0) {
-  //     log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
-  //   });
-  //
-  //   final imageUrl = await ref.getDownloadURL();
-  //   await sendMessage(chatUser, imageUrl, Type.image);
-  // }
   //send chat image
-  // static Future<void> sendChatImage(ChatUser chatUser, File file) async {
-  //   //getting image file extension
-  //   final ext = file.path.split('.').last;
-  //
-  //   //storage file ref with path
-  //   final ref = storage.ref().child(
-  //       'images/${getConversationID(chatUser.id)}/${DateTime.now().millisecondsSinceEpoch}.$ext');
-  //
-  //   //uploading image
-  //   await ref
-  //       .putFile(file, SettableMetadata(contentType: 'image/$ext'))
-  //       .then((p0) {
-  //     log('Data Transferred: ${p0.bytesTransferred / 1000} kb');
-  //   });
-  //
-  //   //updating image in firestore database
-  //   final imageUrl = await ref.getDownloadURL();
-  //   await sendMessage(chatUser, imageUrl, Type.image);
-  // }
+   Future<void> sendChatImage(UserModel chatUser, Map<String, String>? file) async {
+    //getting image file extension
+    String imageUrl = file!['url']!;
+
+    //updating image in firestore database
+    await sendMessage(chatUser, imageUrl, Type.image);
+  }
 
 
   // Delete a message
