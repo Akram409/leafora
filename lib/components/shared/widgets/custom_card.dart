@@ -117,6 +117,7 @@ class CustomCard2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -128,7 +129,7 @@ class CustomCard2 extends StatelessWidget {
           Expanded(
             flex: 1,
             child: SizedBox(
-              height: MediaQuery.of(context).size.width * 0.5, // Maintain aspect ratio
+              height: MediaQuery.of(context).size.width * 0.5,
               child: Lottie.asset(
                 lottieAssetName,
                 fit: BoxFit.contain,
@@ -148,7 +149,7 @@ class CustomCard2 extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: screenWidth *0.04,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 2,
@@ -158,7 +159,7 @@ class CustomCard2 extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: screenWidth * 0.03,
                       color: Colors.grey.shade600,
                     ),
                     maxLines: 3,
@@ -180,7 +181,7 @@ class CustomCard2 extends StatelessWidget {
                     child: Text(
                       buttonText,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: screenWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

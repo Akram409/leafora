@@ -8,8 +8,10 @@ import 'package:leafora/components/shared/widgets/custom_card.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/firebase_database_dir/models/article.dart';
 import 'package:leafora/firebase_database_dir/models/plant.dart';
+import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/article_service.dart';
 import 'package:leafora/firebase_database_dir/service/plant_service.dart';
+import 'package:leafora/services/auth_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePages extends StatefulWidget {
@@ -20,8 +22,36 @@ class HomePages extends StatefulWidget {
 }
 
 class _HomePagesState extends State<HomePages> {
+  final AuthService _authService = AuthService();
+  UserModel? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  // Load user data from Firebase or your service
+  Future<void> _loadCurrentUser() async {
+    try {
+      UserModel? user = await _authService.getCurrentUserData();
+      setState(() {
+        _currentUser = user;
+      });
+      // Print user details after loading
+      if (user != null) {
+        print("Current User: ${user.toJson()}");
+      } else {
+        print("No user data available.");
+      }
+    } catch (e) {
+      print("Error loading current user data: $e");
+    }
+  }
+
   final ArticleService _articleService = ArticleService();
   final PlantService _plantService = PlantService();
+
   List list = [
     "Flutter",
     "React",
@@ -56,16 +86,6 @@ class _HomePagesState extends State<HomePages> {
 
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    // Simulate a loading delay
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +218,7 @@ class _HomePagesState extends State<HomePages> {
                 title: 'Ask Plant Expert',
                 description: 'Our botanist are ready to help with your problems',
                 buttonText: 'Ask the Experts',
-                nextPage: '/askPlantExpert',
+                nextPage: _currentUser?.role == "expert" ? '/askPlantExpert' : '/subscription',
               ),
 
               SizedBox(height: gapHeight1),

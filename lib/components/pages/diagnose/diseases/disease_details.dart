@@ -40,7 +40,7 @@ class _DiseaseDetailsState extends State<DiseaseDetails> {
     double screenWidth = MediaQuery.of(context).size.width;
     double textSize = screenWidth * 0.05;
     return Scaffold(
-      appBar: CustomAppBar4(title: "Disease Details"),
+      appBar: CustomAppBar3(title: "Disease Details"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
@@ -69,83 +69,76 @@ class _DiseaseDetailsState extends State<DiseaseDetails> {
               const SizedBox(height: 10),
 
               // Padding for Disease Content
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // // Title
-                  // Text(
-                  //   diseaseData.diseaseName,
-                  //   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-                  //
-                  // const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Quill Description
+                    QuillEditor.basic(
+                      controller: _descriptionController,
+                      focusNode: FocusNode(),
+                    ),
 
-                  // Quill Description
-                  QuillEditor.basic(
-                    controller: _descriptionController,
-                    focusNode: FocusNode(),
-                  ),
+                    const SizedBox(height: 16),
 
-                  const SizedBox(height: 16),
-
-                  Divider(color: Colors.black, thickness: 1),
-                  Text(
-                    "Was this helpful?",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          // Increment the helpful count or send a feedback action
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Thank you for your feedback!"),
+                    Divider(color: Colors.black, thickness: 1),
+                    Text(
+                      "Was this helpful?",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            // Increment the helpful count or send a feedback action
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Thank you for your feedback!"),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(color: Colors.black),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            elevation: 0,
                           ),
-                          elevation: 0,
+                          child: Text(
+                            "Yes",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
-                        child: Text(
-                          "Yes",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Increment the not helpful count or send a feedback action
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Thank you for your feedback!"),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Increment the not helpful count or send a feedback action
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Thank you for your feedback!"),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(color: Colors.black),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.black),
+                            elevation: 0,
                           ),
-                          elevation: 0,
+                          child: Text(
+                            "No",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
-                        child: Text(
-                          "No",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

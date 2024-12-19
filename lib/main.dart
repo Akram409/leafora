@@ -32,7 +32,7 @@ import 'package:leafora/layout/home_page.dart';
 import 'package:leafora/services/gemini_ai/gemini_plant_disease.dart';
 import 'package:leafora/services/gemini_ai/gemini_plant_genus.dart';
 import 'package:leafora/services/notification_service.dart';
-import 'package:shurjopay/utilities/functions.dart';
+
 
 
 abstract class RoutesNames {

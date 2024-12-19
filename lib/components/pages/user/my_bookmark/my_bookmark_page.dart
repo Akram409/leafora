@@ -11,7 +11,6 @@ class MyBookmarkPage extends StatefulWidget {
 }
 
 class _MyBookmarkPageState extends State<MyBookmarkPage> {
-  static const color = Colors.white;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
