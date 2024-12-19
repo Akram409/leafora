@@ -92,63 +92,63 @@ class _ChatLayoutState extends State<ChatLayout> {
         //
         child: Scaffold(
           //app bar
-          appBar: AppBar(
-            //view profile
-            // TODO: check here
-            leading: IconButton(
-              tooltip: 'View Profile',
-              onPressed: () {
-                // TODO: check here
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (_) => ProfileScreen(user: APIs.me)));
-              },
-              icon: const ProfileImage(size: 32),
-            ),
-
-            //title
-            title: _isSearching
-                ? TextField(
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: 'Name, Email, ...'),
-              autofocus: true,
-              style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
-              //when search text changes then updated search list
-              onChanged: (val) {
-                //search logic
-                _searchList.clear();
-
-                val = val.toLowerCase();
-
-                for (var i in _list) {
-                  if (i.userName!.toLowerCase().contains(val) ||
-                      i.userEmail!.toLowerCase().contains(val)) {
-                    _searchList.add(i);
-                  }
-                }
-                setState(() => _searchList);
-              },
-            )
-                : const Text('Lefora'),
-
-            actions: [
-              //search user button
-              IconButton(
-                  tooltip: 'Search',
-                  onPressed: () => setState(() => _isSearching = !_isSearching),
-                  icon: Icon(_isSearching
-                      ? CupertinoIcons.clear_circled_solid
-                      : CupertinoIcons.search)),
-
-              //add new user
-              IconButton(
-                  tooltip: 'Add User',
-                  padding: const EdgeInsets.only(right: 8),
-                  onPressed: _addChatUserDialog,
-                  icon: const Icon(CupertinoIcons.person_add, size: 25))
-            ],
-          ),
+          // appBar: AppBar(
+          //   //view profile
+          //   // TODO: check here
+          //   leading: IconButton(
+          //     tooltip: 'View Profile',
+          //     onPressed: () {
+          //       // TODO: check here
+          //       // Navigator.push(
+          //       //     context,
+          //       //     MaterialPageRoute(
+          //       //         builder: (_) => ProfileScreen(user: APIs.me)));
+          //     },
+          //     icon: const ProfileImage(size: 32),
+          //   ),
+          //
+          //   //title
+          //   title: _isSearching
+          //       ? TextField(
+          //     decoration: const InputDecoration(
+          //         border: InputBorder.none, hintText: 'Name, Email, ...'),
+          //     autofocus: true,
+          //     style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
+          //     //when search text changes then updated search list
+          //     onChanged: (val) {
+          //       //search logic
+          //       _searchList.clear();
+          //
+          //       val = val.toLowerCase();
+          //
+          //       for (var i in _list) {
+          //         if (i.userName!.toLowerCase().contains(val) ||
+          //             i.userEmail!.toLowerCase().contains(val)) {
+          //           _searchList.add(i);
+          //         }
+          //       }
+          //       setState(() => _searchList);
+          //     },
+          //   )
+          //       : const Text('Lefora'),
+          //
+          //   actions: [
+          //     //search user button
+          //     IconButton(
+          //         tooltip: 'Search',
+          //         onPressed: () => setState(() => _isSearching = !_isSearching),
+          //         icon: Icon(_isSearching
+          //             ? CupertinoIcons.clear_circled_solid
+          //             : CupertinoIcons.search)),
+          //
+          //     //add new user
+          //     IconButton(
+          //         tooltip: 'Add User',
+          //         padding: const EdgeInsets.only(right: 8),
+          //         onPressed: _addChatUserDialog,
+          //         icon: const Icon(CupertinoIcons.person_add, size: 25))
+          //   ],
+          // ),
 
           //floating button to add new user
           floatingActionButton: Padding(
@@ -234,73 +234,73 @@ class _ChatLayoutState extends State<ChatLayout> {
   }
 
   // for adding new chat user
-  void _addChatUserDialog() {
-    String email = '';
-
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          contentPadding: const EdgeInsets.only(
-              left: 24, right: 24, top: 20, bottom: 10),
-
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15))),
-
-          //title
-          title: const Row(
-            children: [
-              Icon(
-                Icons.person_add,
-                color: Colors.blue,
-                size: 28,
-              ),
-              Text('  Add User')
-            ],
-          ),
-
-          //content
-          content: TextFormField(
-            maxLines: null,
-            onChanged: (value) => email = value,
-            decoration: const InputDecoration(
-                hintText: 'Email Id',
-                prefixIcon: Icon(Icons.email, color: Colors.blue),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15)))),
-          ),
-
-          //actions
-          actions: [
-            //cancel button
-            MaterialButton(
-                onPressed: () {
-                  //hide alert dialog
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel',
-                    style: TextStyle(color: Colors.blue, fontSize: 16))),
-
-            //add button
-            MaterialButton(
-                onPressed: () async {
-                  //hide alert dialog
-                  Navigator.pop(context);
-                  if (email.trim().isNotEmpty) {
-                    print("email is this: ${email}");
-                    await chatService.addChatUser(email).then((value) {
-                      print(value);
-                      if (!value) {
-                        Dialogs.showSnackbar(
-                            context, 'User does not Exists!');
-                      }
-                    });
-                  }
-                },
-                child: const Text(
-                  'Add',
-                  style: TextStyle(color: Colors.blue, fontSize: 16),
-                ))
-          ],
-        ));
-  }
+  // void _addChatUserDialog() {
+  //   String email = '';
+  //
+  //   showDialog(
+  //       context: context,
+  //       builder: (_) => AlertDialog(
+  //         contentPadding: const EdgeInsets.only(
+  //             left: 24, right: 24, top: 20, bottom: 10),
+  //
+  //         shape: const RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.all(Radius.circular(15))),
+  //
+  //         //title
+  //         title: const Row(
+  //           children: [
+  //             Icon(
+  //               Icons.person_add,
+  //               color: Colors.blue,
+  //               size: 28,
+  //             ),
+  //             Text('  Add User')
+  //           ],
+  //         ),
+  //
+  //         //content
+  //         content: TextFormField(
+  //           maxLines: null,
+  //           onChanged: (value) => email = value,
+  //           decoration: const InputDecoration(
+  //               hintText: 'Email Id',
+  //               prefixIcon: Icon(Icons.email, color: Colors.blue),
+  //               border: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.all(Radius.circular(15)))),
+  //         ),
+  //
+  //         //actions
+  //         actions: [
+  //           //cancel button
+  //           MaterialButton(
+  //               onPressed: () {
+  //                 //hide alert dialog
+  //                 Navigator.pop(context);
+  //               },
+  //               child: const Text('Cancel',
+  //                   style: TextStyle(color: Colors.blue, fontSize: 16))),
+  //
+  //           //add button
+  //           MaterialButton(
+  //               onPressed: () async {
+  //                 //hide alert dialog
+  //                 Navigator.pop(context);
+  //                 if (email.trim().isNotEmpty) {
+  //                   print("email is this: ${email}");
+  //                   await chatService.addChatUser(email).then((value) {
+  //                     print(value);
+  //                     if (!value) {
+  //                       Dialogs.showSnackbar(
+  //                           context, 'User does not Exists!');
+  //                     }
+  //                   });
+  //                 }
+  //               },
+  //               child: const Text(
+  //                 'Add',
+  //                 style: TextStyle(color: Colors.blue, fontSize: 16),
+  //               ))
+  //         ],
+  //       ));
+  // }
 }

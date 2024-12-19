@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 
@@ -242,6 +244,40 @@ class UserService {
     }
   }
 
+  Future<List<UserModel>> getUsersByRole(String role) async {
+    try {
+      // Query the user collection to find users with the specified role
+      final querySnapshot = await _userCollection.where('role', isEqualTo: role).get();
 
+      // Map the query results to a list of UserModel instances
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print("Error fetching users by role: $e");
+      throw Exception("Failed to fetch users with role $role: $e");
+    }
+  }
+
+  Future<void> updateUserPlanAndPaymentHistory(String userId, String newPlan, Map<String, dynamic> paymentResponse) async {
+    try {
+      // Get a reference to the user document
+      DocumentReference userRef = _firestore.collection('users').doc(userId);
+
+      // Convert payment response to JSON string
+      String paymentDataJson = jsonEncode(paymentResponse);
+
+      // Update the 'plan' field and add to 'paymentHistory'
+      await userRef.update({
+        'plan': newPlan,
+        'paymentHistory': FieldValue.arrayUnion([paymentDataJson]),
+      });
+
+      print("User plan updated and payment history saved successfully for user: $userId");
+    } catch (e) {
+      print("Error updating user plan and payment history: $e");
+      throw Exception("Failed to update user plan and payment history: $e");
+    }
+  }
 
 }

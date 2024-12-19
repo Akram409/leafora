@@ -43,7 +43,7 @@ class _SplashState extends State<Splash> {
                 // Get.offAll(() => AdminDashboard());
                 break;
               case 'expert':
-                // Get.offAll(() => ExpertDashboard());
+                Get.offAll(() => HomePage());
                 break;
               case 'user':
                 Get.offAll(() => HomePage());

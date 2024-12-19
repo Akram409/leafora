@@ -4,6 +4,7 @@ import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/pages/article/article_details/article_details.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:leafora/components/shared/widgets/custom_card.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/firebase_database_dir/models/article.dart';
 import 'package:leafora/firebase_database_dir/models/plant.dart';
@@ -192,6 +193,15 @@ class _HomePagesState extends State<HomePages> {
 
               SizedBox(height: gapHeight1),
 
+              CustomCard2(
+                lottieAssetName: 'assets/images/expert.json',
+                title: 'Ask Plant Expert',
+                description: 'Our botanist are ready to help with your problems',
+                buttonText: 'Ask the Experts',
+                nextPage: '/askPlantExpert',
+              ),
+
+              SizedBox(height: gapHeight1),
               // Explore Plants Section Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

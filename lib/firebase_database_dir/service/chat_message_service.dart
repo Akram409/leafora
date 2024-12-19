@@ -199,8 +199,7 @@ class ChaMessageService{
        log('Error sending message: $e');
      }
 
-     // TODO: check here: push notification add here
-     // Send push notification to the specific user
+     // Sending push notification to the specific user
      final String? userToken = await _userService.getUserToken(chatUser.userId);
      try {
        // Get the user token
@@ -228,8 +227,6 @@ class ChaMessageService{
          log('Removed invalid token: $userToken');
        }
      }
-    // await ref.doc(time).set(message.toJson()).then((value) =>
-    //     sendPushNotification(chatUser, type == Type.text ? msg : 'image'));
   }
 
   // Update read status of a message

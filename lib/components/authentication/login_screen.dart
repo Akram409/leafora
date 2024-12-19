@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     transition: Transition.rightToLeft,
                     duration: Duration(milliseconds: 500));
                 break;
-              case 'experts':
+              case 'expert':
                 CustomToast.show(
                   'Login Successful - Driver!',
                   bgColor: Colors.greenAccent,

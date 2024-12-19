@@ -5,6 +5,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:leafora/components/authentication/login_screen.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/services/auth_service.dart';
+import 'package:badges/badges.dart' as badges;
 
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
@@ -55,7 +56,7 @@ class _MyAccountState extends State<MyAccount> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    print(_currentUser.toString());
+    bool isPlan = _currentUser?.plan == 'pro';
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -82,12 +83,32 @@ class _MyAccountState extends State<MyAccount> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _currentUser?.userName ?? "John Doe",
-                          style: TextStyle(
-                              fontSize: screenWidth * 0.05,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              _currentUser?.userName ?? "John Doe",
+                              style: TextStyle(
+                                  fontSize: screenWidth * 0.06,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: isPlan ? Colors.green : Colors.grey[700],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                isPlan ? "Pro" : "Basic",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -101,7 +122,7 @@ class _MyAccountState extends State<MyAccount> {
                   ),
                   const Icon(
                     Icons.chevron_right_outlined,
-                    color: Colors.black54,
+                    color: Colors.green,
                   ),
                 ],
               ),
@@ -109,8 +130,7 @@ class _MyAccountState extends State<MyAccount> {
               const SizedBox(height: 20),
 
               // Upgrade Plan Section
-
-              Container(
+              if(!isPlan) Container(
                 decoration: BoxDecoration(
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(10),
@@ -133,26 +153,31 @@ class _MyAccountState extends State<MyAccount> {
                     ),
                     // Text content
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Upgrade Plan to Unlock More!",
-                            style: TextStyle(
-                                fontSize: screenWidth * 0.037,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
-                          ),
-                          SizedBox(
-                            height: 3,
-                          ),
-                          Text(
-                            "Enjoy All the benefits and explore more possibilities",
-                            style: TextStyle(
-                                fontSize: screenWidth * 0.02,
-                                color: Colors.white.withOpacity(0.7)),
-                          ),
-                        ],
+                      child: GestureDetector(
+                        onTap: (){
+                          Get.toNamed("/subscription",arguments: _currentUser);
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Upgrade Plan to Unlock More!",
+                              style: TextStyle(
+                                  fontSize: screenWidth * 0.037,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Text(
+                              "Enjoy All the benefits and explore more possibilities",
+                              style: TextStyle(
+                                  fontSize: screenWidth * 0.02,
+                                  color: Colors.white.withOpacity(0.7)),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Icon(
@@ -175,7 +200,7 @@ class _MyAccountState extends State<MyAccount> {
                   icon: Icons.receipt_long_outlined,
                   title: "Billing & Subscription",
                   screenWidth: screenWidth,
-                  path: ""),
+                  path: "subscription"),
               buildSection(
                   icon: Icons.payment_outlined,
                   title: "Payment Methods",
@@ -234,7 +259,11 @@ class _MyAccountState extends State<MyAccount> {
         color: Colors.black54,
       ),
       onTap: () {
-        Get.toNamed(path);
+        if (path == "subscription") {
+          Get.toNamed(path, arguments: _currentUser);
+        } else {
+          Get.toNamed(path);
+        }
       },
     );
   }

@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:bkash/bkash.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:leafora/firebase_database_dir/service/user_service.dart';
 import 'package:uddoktapay/models/customer_model.dart';
 import 'package:uddoktapay/models/request_response.dart';
 import 'package:uddoktapay/uddoktapay.dart';
@@ -11,10 +13,10 @@ import 'package:shurjopay/models/shurjopay_request_model.dart';
 import 'package:shurjopay/models/shurjopay_response_model.dart';
 import 'package:shurjopay/shurjopay.dart';
 
-void paymentHelper(String selected) async {
+void paymentHelper(String selected,String userId) async {
   switch (selected) {
     case 'bkash':
-      bkashPayment();
+      bkashPayment(userId);
       break;
 
     case 'uddoktapay':
@@ -37,7 +39,9 @@ void paymentHelper(String selected) async {
 double totalPrice = 1.00;
 
 // bkash
-void bkashPayment() async {
+void bkashPayment(String userId) async {
+  final UserService userService = UserService();
+
   // instance of bkash
   final bkash = Bkash(
     // for Live bkash payment production
@@ -52,16 +56,35 @@ void bkashPayment() async {
   );
 
   try {
-    // pay without agreement
     final response = await bkash.pay(
       context: Get.context!,
       amount: totalPrice,
-      merchantInvoiceNumber: "invoice2002", // invoice number here
+      merchantInvoiceNumber: "invoice2002",
     );
+
+    // Log response
     print(response.trxId);
     print(response.paymentId);
+    // Serialize response manually
+    final paymentData = {
+      "paymentID": response.paymentId,
+      "trxID": response.trxId,
+      "amount": totalPrice,
+      "currency": "BDT",
+      "paymentExecuteTime": DateTime.now().toIso8601String(),
+      "merchantInvoiceNumber": response.merchantInvoiceNumber,
+      "payerReference": response.payerReference,
+      "customerMsisdn": response.customerMsisdn,
+    };
+
+
+    // Update user plan and payment history
+    String newPlan = "Pro";
+    await userService.updateUserPlanAndPaymentHistory(userId, newPlan, paymentData);
+
+    _showSuccessDialog("Payment Successful", "Your payment was completed successfully.");
   } on BkashFailure catch (e) {
-    print(e.message);
+    print("Payment failed: ${e.message}");
   }
 }
 
@@ -179,4 +202,17 @@ void shurjoPay() async  {
       print(e);
     }
   }
+}
+
+void _showSuccessDialog(String title, String message) {
+  AwesomeDialog(
+    context: Get.context!,
+    dialogType: DialogType.success,
+    animType: AnimType.scale,
+    title: title,
+    desc: message,
+    btnOkOnPress: () {
+      Get.toNamed("/upgradePlantMessage");
+    },
+  ).show();
 }

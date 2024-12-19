@@ -17,8 +17,11 @@ import 'package:leafora/components/pages/diagnose/diseases/common_disease_list.d
 import 'package:leafora/components/pages/diagnose/diseases/disease_details.dart';
 import 'package:leafora/components/pages/diagnose/explore_diseases/category_disease_list.dart';
 import 'package:leafora/components/pages/diagnose/explore_diseases/explore_diseases_list.dart';
+import 'package:leafora/components/pages/expert/expert_page.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
 import 'package:leafora/components/pages/my_account/payment_methods/payment_method_page.dart';
+import 'package:leafora/components/pages/my_account/payment_methods/upgrade_plan_message.dart';
+import 'package:leafora/components/pages/my_account/subscription/subscription_page.dart';
 import 'package:leafora/components/pages/my_plants/diagnosis_history/diagnosis_history_details.dart';
 import 'package:leafora/components/pages/plants/explore_plants/explore_plants.dart';
 import 'package:leafora/components/pages/plants/plant_details/plant_details.dart';
@@ -52,6 +55,9 @@ abstract class RoutesNames {
   static const String diagnosisHistoryDetails = '/diagnosisHistoryDetails';
   static const String myAccount = '/myAccount';
   static const String paymentMethod = '/paymentMethod';
+  static const String askPlantExpert = '/askPlantExpert';
+  static const String subscription = '/subscription';
+  static const String upgradePlantMessage = '/upgradePlantMessage';
 }
 
 void main() async{
@@ -127,6 +133,13 @@ class MyApp extends StatelessWidget {
           page: () =>  MyAccount(),
         ),
         GetPage(
+          name: RoutesNames.subscription,
+          page: () =>  SubscriptionPage(),
+        ),GetPage(
+          name: RoutesNames.upgradePlantMessage,
+          page: () =>  UpgradePlanMessage(),
+        ),
+        GetPage(
           name: RoutesNames.paymentMethod,
           page: () =>  PaymentMethodPage(),
         ),
@@ -157,6 +170,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: RoutesNames.popularArticle,
           page: () => const PopularArticleList(),
+        ),
+        GetPage(
+          name: RoutesNames.askPlantExpert,
+          page: () => const ExpertPage(),
         ),
         GetPage(
           name: RoutesNames.plantDisease,

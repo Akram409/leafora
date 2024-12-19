@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
+import 'package:leafora/services/auth_service.dart';
 import 'package:leafora/services/payment_helper/payment_helper.dart';
 
 class PaymentMethodPage extends StatefulWidget {
@@ -11,6 +12,10 @@ class PaymentMethodPage extends StatefulWidget {
 
 class _PaymentMethodPageState extends State<PaymentMethodPage> {
   String? selected;
+  String? userId; // To store the userId
+  final AuthService _authService = AuthService();
+
+
   List<Map> gateways = [
     {
       'name': 'bKash',
@@ -33,9 +38,20 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGhMPK0wqLrv9z2Z2NKU17pUIpadsmODtVSQ&s',
     },
   ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserId();
+  }
 
+  // Fetch userId of the currently logged-in user
+  void _fetchUserId() async {
+    userId = _authService.userId;
+    setState(() {}); // Update UI after fetching the userId
+  }
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: CustomAppBar3(title: "Payment Method"),
       body: Padding(
@@ -81,7 +97,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ),
             InkWell(
               onTap:
-                  selected == null ? null : () => paymentHelper(selected ?? ''),
+                  selected == null || userId == null ? null : () => paymentHelper(selected!,userId!),
               child: Container(
                 height: 50,
                 width: double.infinity,

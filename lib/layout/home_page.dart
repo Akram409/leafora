@@ -13,7 +13,6 @@ import 'package:leafora/components/pages/my_plants/my_plants.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
-import 'package:leafora/services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +23,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
-  final AuthService _authService = AuthService();
   final ChaMessageService chatService = ChaMessageService();
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
 
