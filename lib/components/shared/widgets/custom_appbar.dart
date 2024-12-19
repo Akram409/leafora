@@ -34,12 +34,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-          onPressed: () {
-            // Notification button action
-          },
-        ),
+        // IconButton(
+        //   icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+        //   onPressed: () {
+        //     // Notification button action
+        //   },
+        // ),
         IconButton(
           icon: const Icon(Icons.bookmark_outline_outlined, color: Colors.black),
           onPressed: () {
@@ -85,14 +85,14 @@ class CustomAppBar2 extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.search, color: Colors.black),
-          onPressed: () {
-            // Bookmark button action
-          },
-        ),
-      ],
+      // actions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.search, color: Colors.black),
+      //     onPressed: () {
+      //       // Bookmark button action
+      //     },
+      //   ),
+      // ],
     );
   }
 
@@ -170,12 +170,13 @@ class CustomAppBar4 extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
+        // IconButton(
+        //   icon: const Icon(Icons.share_outlined, color: Colors.black),
+        //   onPressed: () {
+        //     // Bookmark button action
+        //   },
+        // ),
         IconButton(
-          icon: const Icon(Icons.share_outlined, color: Colors.black),
-          onPressed: () {
-            // Bookmark button action
-          },
-        ),IconButton(
           icon: const Icon(Icons.bookmark_add_outlined, color: Colors.black),
           onPressed: () {
             // Bookmark button action
@@ -220,14 +221,14 @@ class CustomAppBar5 extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.share_outlined, color: Colors.black),
-          onPressed: () {
-            // Bookmark button action
-          },
-        ),
-      ],
+      // actions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.share_outlined, color: Colors.black),
+      //     onPressed: () {
+      //       // Bookmark button action
+      //     },
+      //   ),
+      // ],
     );
   }
 

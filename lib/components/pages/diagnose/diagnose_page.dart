@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,31 +21,6 @@ class _DiagnosePageState extends State<DiagnosePage> {
   final DiseaseService diseaseService = DiseaseService();
   final DiseaseTypeService diseaseTypeService = DiseaseTypeService();
 
-  // Disease Categories Data
-  List<Map<String, String>> diseaseCategories = [
-    {
-      'title': 'Fungal',
-      'image': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
-    },
-    {
-      'title': 'Bacterial',
-      'image': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
-    },
-    {
-      'title': 'Viral',
-      'image': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
-    },
-    {
-      'title': 'Pests',
-      'image': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
-    },
-    {
-      'title': 'Environmental',
-      'image': 'https://i.ibb.co.com/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg'
-    },
-  ];
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -62,6 +36,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
             children: [
               SizedBox(height: gapHeight1),
 
+              // Plant Disease Check Section
               CustomCard(
                 lottieAssetName: 'assets/images/plant-disease.json',
                 title: 'Check Your Plant',
@@ -155,6 +130,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
 
               SizedBox(height: gapHeight1),
 
+              // Genus Check Section
               CustomCard(
                 lottieAssetName: 'assets/images/growth.json',
                 title: 'Check Plant Genus',
@@ -164,7 +140,8 @@ class _DiagnosePageState extends State<DiagnosePage> {
               ),
 
               SizedBox(height: gapHeight1),
-              // Explore Diseases Section Title
+
+              // Explore Diseases Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -202,7 +179,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
 
               SizedBox(height: gapHeight1),
 
-              // Explore Plants Grid
+              // Explore Plants
               StreamBuilder<List<DiseaseTypeModel>>(
                 stream: diseaseTypeService.streamAllDiseaseTypes(),
                 builder: (context, snapshot) {
@@ -316,7 +293,6 @@ class DiseaseCard extends StatelessWidget {
     );
   }
 }
-
 
 class DiseaseSkeletonCard extends StatelessWidget {
   @override

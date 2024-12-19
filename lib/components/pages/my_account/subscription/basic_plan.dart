@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 
 class BasicPlan extends StatefulWidget {
@@ -141,6 +141,7 @@ class FeatureItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = ScreenSize.width(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -152,7 +153,7 @@ class FeatureItem extends StatelessWidget {
           FittedBox(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14),
+              style:  TextStyle(fontSize: screenWidth*0.05),
             ),
           ),
         ],

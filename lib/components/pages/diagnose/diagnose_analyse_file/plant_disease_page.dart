@@ -6,12 +6,13 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
-import 'package:leafora/components/shared/widgets/custom_appbar.dart';
+import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/components/shared/widgets/custom_toast.dart';
 import 'package:leafora/components/shared/widgets/loading_indicator.dart';
 import 'package:leafora/firebase_database_dir/models/diagnosis.dart';
 import 'package:leafora/firebase_database_dir/service/diagnosis_service.dart';
 import 'package:leafora/services/auth_service.dart';
+import 'package:leafora/services/google_translator/google_translator_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:leafora/services/cloudinary_service.dart';
 
@@ -24,6 +25,8 @@ class PlantDiseasePage extends StatefulWidget {
 
 class _PlantDiseasePageState extends State<PlantDiseasePage> {
   bool _isLoading = false;
+  bool _translateResults = false;
+  Map<String, String> _translatedCache = {};
 
   void _saveDiagnosis(
     BuildContext context,
@@ -97,6 +100,42 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
     }
   }
 
+  // Modify the translate function to cache results
+  Future<String> _translateText(String text) async {
+    try {
+      if (_translateResults) {
+        // Check if we already have a translation
+        if (_translatedCache.containsKey(text)) {
+          return _translatedCache[text]!;
+        }
+
+        GoogleTranslatorService translator = GoogleTranslatorService();
+        final translatedText = await translator.translate(text, "bn");
+        // Cache the result
+        _translatedCache[text] = translatedText;
+        return translatedText;
+      } else {
+        // Clear cache when translations are disabled
+        _translatedCache.clear();
+        return text;
+      }
+    } catch (e) {
+      print("Translation error: $e");
+      return text;
+    }
+  }
+
+  // Modify the toggle handler
+  void _handleTranslateToggle(bool value) {
+    setState(() {
+      _translateResults = value;
+      if (!value) {
+        // Clear cached translations when toggled off
+        _translatedCache.clear();
+      }
+    });
+  }
+
   String _extractDiseaseName(String diseaseText) {
     final diseaseLines = diseaseText.split('\n');
     return diseaseLines.isNotEmpty ? diseaseLines.first : "Unknown Disease";
@@ -104,8 +143,39 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: CustomAppBar(title: "Plant Health Detector"),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        leadingWidth: screenWidth * 0.10,
+        title: Center(
+          child: Text(
+            "Plant Disease Detect",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'RobotoMono',
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        actions: [
+          Switch(
+            value: _translateResults,
+            onChanged: _handleTranslateToggle,
+            activeTrackColor: Colors.green,
+            activeColor: Colors.green,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -310,7 +380,6 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
   Widget _buildDiseaseResults(BuildContext context, List<String> diseaseInfo) {
     final currentState = context.read<PlantDiseaseCubit>().state;
     var screenWidth = MediaQuery.of(context).size.width;
-    print("Current state: ${currentState}");
     // Ensure `currentState` is of type `PlantDiseaseDetected`
     if (currentState is! PlantDiseaseDetected) {
       return Center(
@@ -337,10 +406,35 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
           ),
         ),
         const SizedBox(height: 16),
-        Markdown(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          data: diseaseInfo.first,
+        FutureBuilder<String>(
+          future: _translateText(diseaseText),
+          builder: (context, snapshot) {
+            if (_translateResults &&
+                snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child: CustomLoader2(
+                lottieAsset: 'assets/images/loader.json',
+                size: 80,
+              ));
+            }
+
+            if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            }
+
+            return MarkdownBody(
+              data: snapshot.data ?? diseaseText,
+              shrinkWrap: true,
+              onTapLink: (text, href, title) {
+                // Handle link taps if needed
+              },
+              styleSheet: MarkdownStyleSheet(
+                h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                h2: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                p: const TextStyle(fontSize: 16),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 16),
         _isLoading
@@ -370,7 +464,10 @@ class _PlantDiseasePageState extends State<PlantDiseasePage> {
             'Detect Another Plant',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          onPressed: () => context.read<PlantDiseaseCubit>().resetState(),
+          onPressed: () {
+            _translateResults = false;
+            context.read<PlantDiseaseCubit>().resetState();
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             textStyle: const TextStyle(fontSize: 17),

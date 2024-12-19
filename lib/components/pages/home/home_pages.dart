@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/pages/article/article_details/article_details.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -22,6 +21,8 @@ class HomePages extends StatefulWidget {
 }
 
 class _HomePagesState extends State<HomePages> {
+  final ArticleService _articleService = ArticleService();
+  final PlantService _plantService = PlantService();
   final AuthService _authService = AuthService();
   UserModel? _currentUser;
 
@@ -49,43 +50,8 @@ class _HomePagesState extends State<HomePages> {
     }
   }
 
-  final ArticleService _articleService = ArticleService();
-  final PlantService _plantService = PlantService();
-
-  List list = [
-    "Flutter",
-    "React",
-    "Ionic",
-    "Xamarin",
-  ];
-
-  // Plant Categories Data
-  List<Map<String, String>> plantCategories = [
-    {
-      'title': 'Succulents & Cacti',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Flowering Plants',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Foliage Plants',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {'title': 'Trees', 'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'},
-    {
-      'title': 'Weeds & Shrubs',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Fruits',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-  ];
 
   bool isLoading = true;
-
 
   @override
   Widget build(BuildContext context) {
@@ -98,32 +64,6 @@ class _HomePagesState extends State<HomePages> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: gapHeight1),
-
-              // Search Bar
-              GFSearchBar(
-                searchList: list,
-                searchQueryBuilder: (query, list) {
-                  return list
-                      .where((item) =>
-                          item.toLowerCase().contains(query.toLowerCase()))
-                      .toList();
-                },
-                overlaySearchListItemBuilder: (item) {
-                  return Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      item,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  );
-                },
-                onItemSelected: (item) {
-                  setState(() {
-                    print('$item');
-                  });
-                },
-              ),
               SizedBox(height: gapHeight1),
 
               // Popular Articles Section
@@ -213,6 +153,7 @@ class _HomePagesState extends State<HomePages> {
 
               SizedBox(height: gapHeight1),
 
+              // Ask to experts
               CustomCard2(
                 lottieAssetName: 'assets/images/expert.json',
                 title: 'Ask Plant Expert',
@@ -388,7 +329,6 @@ class ArticleCard extends StatelessWidget {
   }
 }
 
-
 class ArticleCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -432,7 +372,7 @@ class PlantCategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Example: Get.toNamed("/plantDetails", arguments: plant);
+         Get.toNamed("/plantDetails", arguments: plant);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -449,7 +389,7 @@ class PlantCategoryItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Plant image from dynamic data (URL)
+            // Plant image from dynamic data
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: CachedNetworkImage(
@@ -480,7 +420,6 @@ class PlantCategoryItem extends StatelessWidget {
     );
   }
 }
-
 
 class PlantCategorySkeleton extends StatelessWidget {
   @override

@@ -102,7 +102,7 @@ class _ProPlanState extends State<ProPlan> {
                       Get.toNamed("/paymentMethod");
                     },
                     child: Text(
-                      isProPlan ? 'Current Plan: Pro' : 'Continue - \u{09F3}0',
+                      isProPlan ? 'Current Plan: Pro' : 'Continue - \u{09F3}1',
                       style: TextStyle(
                         fontSize: screenWidth * 0.05,
                         fontWeight: FontWeight.bold,

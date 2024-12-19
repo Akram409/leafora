@@ -3,14 +3,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:leafora/components/pages/my_plants/diagnosis_history/my_diagnosis_history.dart';
 import 'package:leafora/components/pages/my_plants/plants/my_plants_page.dart';
 
-class MyPlants extends StatefulWidget {
-  const MyPlants({super.key});
+class MyPlantsBar extends StatefulWidget {
+  const MyPlantsBar({super.key});
 
   @override
-  State<MyPlants> createState() => _MyPlantsState();
+  State<MyPlantsBar> createState() => _MyPlantsBarState();
 }
 
-class _MyPlantsState extends State<MyPlants> {
+class _MyPlantsBarState extends State<MyPlantsBar> {
   static const color = Colors.white;
   @override
   Widget build(BuildContext context) {

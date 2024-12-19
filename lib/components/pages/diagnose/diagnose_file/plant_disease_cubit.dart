@@ -11,6 +11,7 @@ class PlantDiseaseCubit extends Cubit<PlantDiseaseState> {
   PlantDiseaseCubit(this.plantDiseaseRepository) : super(PlantDiseaseInitial());
 
   void resetState() {
+
     emit(PlantDiseaseInitial());
   }
 

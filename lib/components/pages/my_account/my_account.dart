@@ -191,11 +191,11 @@ class _MyAccountState extends State<MyAccount> {
               const SizedBox(height: 20),
 
               // Section List
-              buildSection(
-                  icon: Icons.person_outline,
-                  title: "My Account",
-                  screenWidth: screenWidth,
-                  path: ""),
+              // buildSection(
+              //     icon: Icons.person_outline,
+              //     title: "My Account",
+              //     screenWidth: screenWidth,
+              //     path: ""),
               buildSection(
                   icon: Icons.receipt_long_outlined,
                   title: "Billing & Subscription",
@@ -206,11 +206,11 @@ class _MyAccountState extends State<MyAccount> {
                   title: "Payment Methods",
                   screenWidth: screenWidth,
                   path: "paymentMethod"),
-              buildSection(
-                  icon: Icons.info_outline,
-                  title: "About Us",
-                  screenWidth: screenWidth,
-                  path: ""),
+              // buildSection(
+              //     icon: Icons.info_outline,
+              //     title: "About Us",
+              //     screenWidth: screenWidth,
+              //     path: ""),
 
               // Logout Button
               ListTile(
