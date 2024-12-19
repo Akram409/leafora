@@ -8,6 +8,7 @@ import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
 import 'package:leafora/firebase_database_dir/models/disease_type.dart';
 import 'package:leafora/firebase_database_dir/service/disease_type_service.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ExploreDiseasesList extends StatefulWidget {
   const ExploreDiseasesList({super.key});
@@ -18,19 +19,20 @@ class ExploreDiseasesList extends StatefulWidget {
 
 class _ExploreDiseasesListState extends State<ExploreDiseasesList> {
   final DiseaseTypeService diseaseTypeService = DiseaseTypeService();
-
-  List<String> list = [
-    "Flutter",
-    "React",
-    "Ionic",
-    "Xamarin",
-  ];
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text;
+      });
+    });
+
     // Simulate a loading delay
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
@@ -49,33 +51,24 @@ class _ExploreDiseasesListState extends State<ExploreDiseasesList> {
           SizedBox(height: gapHeight1),
 
           // Search Bar
-          GFSearchBar(
-            searchList: list,
-            searchQueryBuilder: (query, list) {
-              return list
-                  .where((item) =>
-                  item.toLowerCase().contains(query.toLowerCase()))
-                  .toList();
-            },
-            overlaySearchListItemBuilder: (item) {
-              return Container(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  item,
-                  style: const TextStyle(fontSize: 18),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search article...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey),
                 ),
-              );
-            },
-            onItemSelected: (item) {
-              setState(() {
-                print('$item');
-              });
-            },
+              ),
+            ),
           ),
 
           // StreamBuilder with ListView.builder for loading state
           StreamBuilder<List<DiseaseTypeModel>>(
-            stream: diseaseTypeService.streamAllDiseaseTypes(),
+            stream: isLoading ? diseaseTypeService.streamAllDiseaseTypes() : diseaseTypeService.getFilteredDiseaseTypesStream(searchQuery),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SizedBox(

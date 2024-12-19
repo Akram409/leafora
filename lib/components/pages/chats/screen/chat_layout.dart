@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:leafora/components/pages/chats/widget/chat_user_card.dart';
-import 'package:leafora/components/pages/chats/widget/dialoge.dart';
-import 'package:leafora/components/pages/chats/widget/profile_image.dart';
+import 'package:leafora/components/pages/my_account/subscription/basic_plan.dart';
+import 'package:leafora/components/pages/my_account/subscription/pro_plan.dart';
+import 'package:leafora/components/pages/my_account/subscription/subscription_page.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
 import 'package:leafora/services/auth_service.dart';
@@ -42,12 +45,11 @@ class _ChatLayoutState extends State<ChatLayout> {
   Future<void> _loadCurrentUser() async {
     try {
       UserModel? user = await _authService.getCurrentUserData();
-      setState(() {
-        _currentUser = user;
-      });
-      // Print user details after loading
       if (user != null) {
-        // print("Current User: ${user.toJson()}");
+        setState(() {
+          _currentUser = user;
+        });
+
       } else {
         print("No user data available.");
       }
@@ -58,8 +60,99 @@ class _ChatLayoutState extends State<ChatLayout> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    return GestureDetector(
+    // Conditionally render widgets based on user plan
+    if (_currentUser?.plan == 'basic') {
+      return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: Center(
+              child: Text(
+                "Upgrade Plan",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'RobotoMono',
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(50),
+              child: Center(
+                child: Container(
+                  width: screenWidth * 0.85,
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.greenAccent,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: TabBar(
+                    indicator: ShapeDecoration(
+                      color: Colors.greenAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.black,
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Basic",
+                              style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.crown,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              "Pro",
+                              style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    BasicPlan(user: _currentUser),
+                    ProPlan(user: _currentUser),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {return GestureDetector(
       //for hiding keyboard when a tap is detected on screen
       onTap: FocusScope.of(context).unfocus,
       child: PopScope(
@@ -230,7 +323,8 @@ class _ChatLayoutState extends State<ChatLayout> {
           ),
         ),
       ),
-    );
+    );}
+
   }
 
   // for adding new chat user

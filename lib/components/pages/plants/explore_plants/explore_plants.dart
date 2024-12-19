@@ -18,41 +18,20 @@ class ExplorePlants extends StatefulWidget {
 
 class _ExplorePlantsState extends State<ExplorePlants> {
   final PlantService _plantService = PlantService();
-  List list = [
-    "Flutter",
-    "React",
-    "Ionic",
-    "Xamarin",
-  ];
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
-  List<Map<String, String>> plantCategories = [
-    {
-      'title': 'Succulents & Cacti',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Flowering Plants',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Foliage Plants',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {'title': 'Trees', 'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'},
-    {
-      'title': 'Weeds & Shrubs',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-    {
-      'title': 'Fruits',
-      'image': 'https://i.ibb.co.com/WHz0bWq/pngwing-com.png'
-    },
-  ];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text;
+      });
+    });
+
     // Simulate a loading delay
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
@@ -66,7 +45,7 @@ class _ExplorePlantsState extends State<ExplorePlants> {
     var screenWidth = ScreenSize.width(context);
     var gapHeight1 = 10.0;
     return Scaffold(
-      appBar: CustomAppBar3(title: "Explore Plants"),
+      appBar: CustomAppBar(title: "Explore Plants"),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -74,36 +53,28 @@ class _ExplorePlantsState extends State<ExplorePlants> {
           children: [
             SizedBox(height: gapHeight1),
             // Search Bar
-            GFSearchBar(
-              searchList: list,
-              searchQueryBuilder: (query, list) {
-                return list
-                    .where((item) =>
-                    item.toLowerCase().contains(query.toLowerCase()))
-                    .toList();
-              },
-              overlaySearchListItemBuilder: (item) {
-                return Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search article...",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
-                );
-              },
-              onItemSelected: (item) {
-                setState(() {
-                  print('$item');
-                });
-              },
+                ),
+              ),
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Skeletonizer(
                 enabled: isLoading,
                 enableSwitchAnimation: true,
                 child: StreamBuilder<List<PlantModel>>(
-                  stream: _plantService.getAllPlantsStream(),
+                  stream: isLoading ? _plantService.getAllPlantsStream():_plantService.getFilteredPlantsStream(searchQuery) ,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return GridView.builder(

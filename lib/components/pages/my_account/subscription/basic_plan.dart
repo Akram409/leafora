@@ -149,11 +149,11 @@ class FeatureItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           FittedBox(
             child: Text(
               text,
-              style:  TextStyle(fontSize: screenWidth*0.05),
+              style:  TextStyle(fontSize: screenWidth*0.035),
             ),
           ),
         ],

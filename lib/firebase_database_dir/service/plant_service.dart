@@ -5,11 +5,15 @@ class PlantService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createPlant(PlantModel plant) async {
-    await _firestore.collection('plants').doc(plant.plantId).set(plant.toJson());
+    await _firestore
+        .collection('plants')
+        .doc(plant.plantId)
+        .set(plant.toJson());
   }
 
   Future<PlantModel?> getPlant(String plantId) async {
-    DocumentSnapshot doc = await _firestore.collection('plants').doc(plantId).get();
+    DocumentSnapshot doc =
+        await _firestore.collection('plants').doc(plantId).get();
     if (doc.exists) {
       return PlantModel.fromJson(doc.data() as Map<String, dynamic>);
     }
@@ -32,4 +36,15 @@ class PlantService {
     });
   }
 
+  Stream<List<PlantModel>> getFilteredPlantsStream(String query) {
+    return _firestore.collection('plants').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return PlantModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).where((plant) {
+        final lowerCaseQuery = query.toLowerCase();
+        return plant.plantName!.toLowerCase().contains(lowerCaseQuery) ||
+            plant.genus!.toLowerCase().contains(lowerCaseQuery);
+      }).toList();
+    });
+  }
 }

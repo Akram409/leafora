@@ -58,4 +58,19 @@ class DiseaseTypeService {
       throw Exception('Error streaming disease types: $e');
     }
   }
+
+  // Stream filtered by diseaseTypeName
+  Stream<List<DiseaseTypeModel>> getFilteredDiseaseTypesStream(String diseaseTypeName) {
+    return _firestore
+        .collection('disease_types')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return DiseaseTypeModel.fromJson(doc.data() as Map<String, dynamic>, doc.id);
+      }).where((diseaseType) {
+        final lowerCaseQuery = diseaseTypeName.toLowerCase();
+        return diseaseType.diseaseTypeName.toLowerCase().contains(lowerCaseQuery);
+      }).toList();
+    });
+  }
 }

@@ -44,4 +44,19 @@ class DiseaseService {
       }).toList();
     });
   }
+
+// Stream filtered by diseaseName
+  Stream<List<DiseaseModel>> getFilteredDiseasesStream(String query) {
+    return _firestore
+        .collection('diseases')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return DiseaseModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).where((disease) {
+        final lowerCaseQuery = query.toLowerCase();
+        return disease.diseaseName.toLowerCase().contains(lowerCaseQuery);
+      }).toList();
+    });
+  }
 }

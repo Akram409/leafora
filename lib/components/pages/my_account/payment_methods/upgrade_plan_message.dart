@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:leafora/main.dart';
 
 class UpgradePlanMessage extends StatelessWidget {
   const UpgradePlanMessage({super.key});
@@ -70,8 +71,9 @@ class UpgradePlanMessage extends StatelessWidget {
             // Close and Navigate button
             ElevatedButton(
               onPressed: () {
-                Get.toNamed("/home");
+                Get.offAll(RoutesNames.home);
               },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),

@@ -219,12 +219,12 @@ class _PlantDetailsByIdState extends State<PlantDetailsById> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.black),
-            onPressed: () {
-              // Bookmark button action
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.share_outlined, color: Colors.black),
+          //   onPressed: () {
+          //     // Bookmark button action
+          //   },
+          // ),
           IconButton(
             mouseCursor: SystemMouseCursors.click,
             icon: Icon(

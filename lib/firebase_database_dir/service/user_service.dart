@@ -1,21 +1,26 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference _userCollection =
-  FirebaseFirestore.instance.collection("users");
+      FirebaseFirestore.instance.collection("users");
+  // Stream for auth state changes
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   Future<String?> getUserToken(String? userId) async {
     try {
       final querySnapshot =
-      await _userCollection.where('userId', isEqualTo: userId).get();
+          await _userCollection.where('userId', isEqualTo: userId).get();
 
       // Fetch the first document and extract the `fcm_token` field
       if (querySnapshot.docs.isNotEmpty) {
-        final docData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+        final docData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>?;
         return docData?['fcm_token'] as String?;
       }
       return null;
@@ -25,7 +30,16 @@ class UserService {
     }
   }
 
-
+  // Stream to get user data by userId
+  Stream<UserModel?> getUserData() {
+    User? user = _auth.currentUser;
+    return _firestore.collection('users').doc(user!.uid).snapshots().map((doc) {
+      if (doc.exists) {
+        return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+      }
+      return null;
+    });
+  }
   // Update FCM token for the user
   Future<void> updateFcmToken(String userId, String fcmToken) async {
     try {
@@ -45,7 +59,9 @@ class UserService {
   Future<void> removeInvalidToken(String? invalidToken) async {
     try {
       // Query for the document where the token matches
-      final querySnapshot = await _userCollection.where('fcm_token', isEqualTo: invalidToken).get();
+      final querySnapshot = await _userCollection
+          .where('fcm_token', isEqualTo: invalidToken)
+          .get();
 
       for (var doc in querySnapshot.docs) {
         // Remove the token field from the document
@@ -247,7 +263,8 @@ class UserService {
   Future<List<UserModel>> getUsersByRole(String role) async {
     try {
       // Query the user collection to find users with the specified role
-      final querySnapshot = await _userCollection.where('role', isEqualTo: role).get();
+      final querySnapshot =
+          await _userCollection.where('role', isEqualTo: role).get();
 
       // Map the query results to a list of UserModel instances
       return querySnapshot.docs
@@ -259,7 +276,8 @@ class UserService {
     }
   }
 
-  Future<void> updateUserPlanAndPaymentHistory(String userId, String newPlan, Map<String, dynamic> paymentResponse) async {
+  Future<void> updateUserPlanAndPaymentHistory(String userId, String newPlan,
+      Map<String, dynamic> paymentResponse) async {
     try {
       // Get a reference to the user document
       DocumentReference userRef = _firestore.collection('users').doc(userId);
@@ -269,15 +287,16 @@ class UserService {
 
       // Update the 'plan' field and add to 'paymentHistory'
       await userRef.update({
+        'role': "expert",
         'plan': newPlan,
         'paymentHistory': FieldValue.arrayUnion([paymentDataJson]),
       });
 
-      print("User plan updated and payment history saved successfully for user: $userId");
+      print(
+          "User plan updated and payment history saved successfully for user: $userId");
     } catch (e) {
       print("Error updating user plan and payment history: $e");
       throw Exception("Failed to update user plan and payment history: $e");
     }
   }
-
 }

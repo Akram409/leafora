@@ -150,12 +150,12 @@ class _ArticleDetailsState extends State<ArticleDetails> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.black),
-            onPressed: () {
-              // Bookmark button action
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.share_outlined, color: Colors.black),
+          //   onPressed: () {
+          //     // Bookmark button action
+          //   },
+          // ),
           IconButton(
             mouseCursor: SystemMouseCursors.click,
             icon: Icon(
@@ -250,6 +250,7 @@ class _ArticleDetailsState extends State<ArticleDetails> {
                     color: Colors.black,
                     thickness: 1,
                   ),
+                  // TODO: was this helpful do it
                   Text("Was this helpful?",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

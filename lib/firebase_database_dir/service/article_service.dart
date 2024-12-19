@@ -33,4 +33,20 @@ class ArticleService {
       }).toList();
     });
   }
+
+  Stream<List<ArticleModel>> getFilteredArticlesStream(String query) {
+    return _firestore
+        .collection('articles')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return ArticleModel.fromJson(doc.data() as Map<String, dynamic>);
+      }).where((article) {
+        final lowerCaseQuery = query.toLowerCase();
+        return article.title.toLowerCase().contains(lowerCaseQuery) ||
+            article.authorName.toLowerCase().contains(lowerCaseQuery);
+      }).toList();
+    });
+  }
+
 }

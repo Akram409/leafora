@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getwidget/components/search_bar/gf_search_bar.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/components/shared/widgets/custom_loader.dart';
@@ -18,43 +17,22 @@ class PopularArticleList extends StatefulWidget {
 
 class _PopularArticleListState extends State<PopularArticleList> {
   final ArticleService _articleService = ArticleService();
-  List<Map<String, String>> articles = [
-    {
-      'title': 'Unlock the Secrets of Succulents: Care Tips for Beginners',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'The Ultimate Guide to Indoor Plants: From A to Z',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Why You Should Start Growing Your Own Herbs at Home',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'Top 10 Indoor Plants That Thrive in Low Light',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-    {
-      'title': 'How to Care for Orchids: Tips from Experts',
-      'imageUrl': 'https://i.ibb.co/MsMDWYZ/closeup-ripe-fig-tree-sunlight.jpg',
-    },
-  ];
-
-  List list = [
-    "Flutter",
-    "React",
-    "Ionic",
-    "Xamarin",
-  ];
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text;
+      });
+    });
+
     // Simulate a loading delay
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         isLoading = false;
       });
@@ -63,10 +41,11 @@ class _PopularArticleListState extends State<PopularArticleList> {
 
   @override
   Widget build(BuildContext context) {
+    print(searchQuery);
     var screenWidth = ScreenSize.width(context);
     var gapHeight1 = 10.0;
     return Scaffold(
-      appBar: CustomAppBar3(title: "Popular Article"),
+      appBar: CustomAppBar(title: "Popular Article"),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -74,34 +53,28 @@ class _PopularArticleListState extends State<PopularArticleList> {
           children: [
             SizedBox(height: gapHeight1),
             // Search Bar
-            GFSearchBar(
-              searchList: list,
-              searchQueryBuilder: (query, list) {
-                return list
-                    .where((item) =>
-                    item.toLowerCase().contains(query.toLowerCase()))
-                    .toList();
-              },
-              overlaySearchListItemBuilder: (item) {
-                return Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search article...",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
-                );
-              },
-              onItemSelected: (item) {
-                setState(() {
-                  print('$item');
-                });
-              },
+                ),
+              ),
             ),
+
             Skeletonizer(
-              enabled: isLoading,
+              enabled: isLoading ,
               enableSwitchAnimation: true,
               child: StreamBuilder<List<ArticleModel>>(
-                stream: _articleService.getAllArticlesStream(), // Assuming Firebase stream
+                stream: isLoading
+                    ? _articleService.getAllArticlesStream()
+                    : _articleService.getFilteredArticlesStream(searchQuery),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return ListView.builder(
@@ -122,10 +95,10 @@ class _PopularArticleListState extends State<PopularArticleList> {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No articles available.'));
+                    return Center(child: Text('No articles found.'));
                   }
 
-                  // Get articles from the snapshot
+                  // Display filtered or all articles
                   final articles = snapshot.data!;
                   return ListView.builder(
                     shrinkWrap: true,
@@ -151,6 +124,7 @@ class _PopularArticleListState extends State<PopularArticleList> {
     );
   }
 }
+
 class ArticleCard extends StatelessWidget {
   final ArticleModel article;
 
@@ -202,11 +176,11 @@ class ArticleCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(
-                  Icons.more_vert_rounded,
-                  size: screenWidth * 0.05,
-                  color: Colors.black26,
-                ),
+                // Icon(
+                //   Icons.more_vert_rounded,
+                //   size: screenWidth * 0.05,
+                //   color: Colors.black26,
+                // ),
               ],
             ),
           ],
@@ -215,7 +189,6 @@ class ArticleCard extends StatelessWidget {
     );
   }
 }
-
 
 class ArticleCardSkeleton extends StatelessWidget {
   @override

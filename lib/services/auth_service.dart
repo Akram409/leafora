@@ -9,6 +9,8 @@ class AuthService {
 
   // Stream for auth state changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+  // Stream for current user's data
+
 
   // Sign in method
   Future<app_user.UserModel?> signIn(String email, String password) async {
@@ -82,7 +84,6 @@ class AuthService {
     return FirebaseAuth.instance.currentUser?.uid;
   }
 
-
   // Fetch current user's data from Firestore
   Future<app_user.UserModel?> getCurrentUserData() async {
     try {
@@ -110,12 +111,10 @@ class AuthService {
     }
   }
 
-
   // Check if user is logged in
   Future<User?> getCurrentUser() async {
     return _auth.currentUser;
   }
-
   Future<String?> getUserName(String uid) async {
     try {
       final user = await _userService.getUser(uid);
@@ -130,7 +129,6 @@ class AuthService {
       return null;
     }
   }
-
 
   // Get current user
   User? get currentUser => _auth.currentUser;

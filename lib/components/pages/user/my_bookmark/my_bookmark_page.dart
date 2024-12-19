@@ -39,14 +39,14 @@ class _MyBookmarkPageState extends State<MyBookmarkPage> {
               ),
             ),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.black),
-              onPressed: () {
-                // Bookmark button action
-              },
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.search, color: Colors.black),
+          //     onPressed: () {
+          //       // Bookmark button action
+          //     },
+          //   ),
+          // ],
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(60),
             child: Center(

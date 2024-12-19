@@ -151,7 +151,7 @@ class _HomePagesState extends State<HomePages> {
                 },
               ),
 
-              SizedBox(height: gapHeight1),
+              // SizedBox(height: gapHeight1),
 
               // Ask to experts
               CustomCard2(
@@ -162,7 +162,7 @@ class _HomePagesState extends State<HomePages> {
                 nextPage: _currentUser?.role == "expert" ? '/askPlantExpert' : '/subscription',
               ),
 
-              SizedBox(height: gapHeight1),
+              // SizedBox(height: gapHeight1),
               // Explore Plants Section Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

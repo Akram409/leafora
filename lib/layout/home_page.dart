@@ -5,11 +5,13 @@ import 'package:leafora/components/pages/chats/screen/chat_layout.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/home/home_pages.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
+import 'package:leafora/components/pages/my_account/subscription/subscription_page.dart';
 import 'package:leafora/components/pages/my_plants/my_plants.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
+import 'package:leafora/firebase_database_dir/service/user_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,9 +23,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final ChaMessageService chatService = ChaMessageService();
-   UserModel? currentUser;
+
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
 
+  // Load user data from Firebase or your service
   int currentIndex = 0;
 
 // Navigation items for the bottom bar
@@ -32,7 +35,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       Icon(Icons.home_outlined, size: 30, color: Colors.white),
       Icon(FontAwesomeIcons.userDoctor, size: 30, color: Colors.white),
       Icon(FontAwesomeIcons.plantWilt, size: 30, color: Colors.white),
-      if (currentUser?.role == "expert") Icon(FontAwesomeIcons.message, size: 30, color: Colors.white),
+      Icon(FontAwesomeIcons.message, size: 30, color: Colors.white),
       Icon(Icons.person, size: 30, color: Colors.white),
     ];
   }
@@ -75,7 +78,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       HomePages(),
       DiagnosePage(),
       MyPlantsBar(),
-      if (currentUser?.role == "expert") ChatLayout(),
+      ChatLayout(),
       MyAccount(),
     ];
   }
@@ -86,7 +89,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       'Home',
       'Diagnose',
       'Plants',
-      if (currentUser?.role == "expert") 'Chats',
+      'Chats',
       'Profile',
     ];
   }

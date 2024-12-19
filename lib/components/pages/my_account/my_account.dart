@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:leafora/components/authentication/login_screen.dart';
 import 'package:leafora/firebase_database_dir/models/user.dart';
+import 'package:leafora/firebase_database_dir/service/user_service.dart';
 import 'package:leafora/services/auth_service.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -16,6 +17,7 @@ class MyAccount extends StatefulWidget {
 
 class _MyAccountState extends State<MyAccount> {
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
   UserModel? _currentUser;
 
   @override
@@ -25,9 +27,8 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   // Load user data from Firebase or your service
-  Future<void> _loadCurrentUser() async {
-    try {
-      UserModel? user = await _authService.getCurrentUserData();
+  void _loadCurrentUser() {
+    _userService.getUserData().listen((user) {
       setState(() {
         _currentUser = user;
       });
@@ -37,9 +38,7 @@ class _MyAccountState extends State<MyAccount> {
       } else {
         print("No user data available.");
       }
-    } catch (e) {
-      print("Error loading current user data: $e");
-    }
+    });
   }
 
   // Logout function
@@ -56,7 +55,7 @@ class _MyAccountState extends State<MyAccount> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    bool isPlan = _currentUser?.plan == 'pro';
+    bool isPlan = _currentUser?.plan == 'Pro';
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(

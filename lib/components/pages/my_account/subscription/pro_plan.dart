@@ -15,7 +15,7 @@ class _ProPlanState extends State<ProPlan> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    bool isProPlan = widget.user?.plan == 'pro';
+    bool isProPlan = widget.user?.plan == 'Pro';
     return Scaffold(
       body: Center(
         child: Padding(
