@@ -11,7 +11,6 @@ import 'package:leafora/components/pages/article/article_details/article_details
 import 'package:leafora/components/pages/article/popular_article_list/popular_article_list.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_disease_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_analyse_file/plant_genus_page.dart';
-import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_file/plant_disease_cubit.dart';
 import 'package:leafora/components/pages/diagnose/diseases/common_disease_list.dart';
 import 'package:leafora/components/pages/diagnose/diseases/disease_details.dart';

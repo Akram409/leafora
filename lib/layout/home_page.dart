@@ -5,13 +5,10 @@ import 'package:leafora/components/pages/chats/screen/chat_layout.dart';
 import 'package:leafora/components/pages/diagnose/diagnose_page.dart';
 import 'package:leafora/components/pages/home/home_pages.dart';
 import 'package:leafora/components/pages/my_account/my_account.dart';
-import 'package:leafora/components/pages/my_account/subscription/subscription_page.dart';
 import 'package:leafora/components/pages/my_plants/my_plants.dart';
 import 'package:leafora/components/shared/utils/screen_size.dart';
 import 'package:leafora/components/shared/widgets/custom_appbar.dart';
-import 'package:leafora/firebase_database_dir/models/user.dart';
 import 'package:leafora/firebase_database_dir/service/chat_message_service.dart';
-import 'package:leafora/firebase_database_dir/service/user_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

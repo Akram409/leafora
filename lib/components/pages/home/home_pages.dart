@@ -280,7 +280,7 @@ class ArticleCard extends StatelessWidget {
         Get.to(ArticleDetails(), arguments: article);
       },
       child: Container(
-        width: 200,
+        width: 230,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -293,7 +293,7 @@ class ArticleCard extends StatelessWidget {
                 imageUrl: article.articleImage,
                 fit: BoxFit.cover,
                 height: 150,
-                width: 200,
+                width: 220,
                 placeholder: (context, url) => const CustomLoader2(
                   lottieAsset: 'assets/images/loader.json',
                   size: 60,
@@ -311,14 +311,9 @@ class ArticleCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: screenWidth * 0.04,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Icon(
-                  Icons.more_vert_rounded,
-                  size: screenWidth * 0.05,
-                  color: Colors.black26,
                 ),
               ],
             ),
