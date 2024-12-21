@@ -2,13 +2,6 @@
 
 A cross-platform Flutter application that leverages AI to assist users in identifying plant diseases and genus, provides expert consultations, and serves as an educational hub for plant enthusiasts.
 
-## App Screenshots
-
-Here is a quick look at the app's screenshots:
-![screenshot](assets/images/screen1.png)
-![screenshot](assets/images/screen2.png)
-![screenshot](assets/images/screen3.png)    
-
 [//]: # (## App Video)
 
 [//]: # ()
@@ -21,6 +14,49 @@ Here is a quick look at the app's screenshots:
 
 [Google Drive](https://drive.google.com/file/d/1leLIeT8MAH5hjKy4l5HGTRvD7q1jASuf/view?usp=sharing) - Visit the link to download the app.
 
+## Leafora App Demo
+
+### Onboard Section
+![screenshot](assets/github/1.png)
+
+### Login & Signup Section
+![screenshot](assets/github/2.png)
+
+### Home - Popular Article - Explore Plant Section
+![screenshot](assets/github/3.png)
+
+### Article & Plant Details Section
+![screenshot](assets/github/4.png)
+
+### Diagnosis - Common Disease - Explore Disease Section
+![screenshot](assets/github/5.png)
+
+### Plant Disease Detect By AI Section
+![screenshot](assets/github/6.png)
+Translate EN to BN by Google Translator:
+![screenshot](assets/github/7.png)
+
+### Plant Genus Detect By AI Section
+![screenshot](assets/github/8.png)
+Translate EN to BN by Google Translator:
+![screenshot](assets/github/9.png)
+
+### My Plants Section
+![screenshot](assets/github/10.png)
+
+### My Account Section (Basic & Pro Version)
+![screenshot](assets/github/11.png)
+
+### Upgrade Plan Section (Basic & Pro)
+![screenshot](assets/github/12.png)
+
+### Payment Method (Currently Active **Bkash**)
+![screenshot](assets/github/13.png)
+After a successful payment:
+![screenshot](assets/github/14.png)
+
+### Expert Chat Section (Pro Features)
+![screenshot](assets/github/15.png)
 
 ## App Features
 
