@@ -17,46 +17,46 @@ A cross-platform Flutter application that leverages AI to assist users in identi
 ## Leafora App Demo
 
 ### Onboard Section 
-![screenshot](assets/github/1.png)
+![screenshot](assets/git/1.png)
 
 ### Login & Signup Section
-![screenshot](assets/github/2.png)
+![screenshot](assets/git/2.png)
 
 ### Home - Popular Article - Explore Plant Section
-![screenshot](assets/github/3.png)
+![screenshot](assets/git/3.png)
 
 ### Article & Plant Details Section
-![screenshot](assets/github/4.png)
+![screenshot](assets/git/4.png)
 
 ### Diagnosis - Common Disease - Explore Disease Section
-![screenshot](assets/github/5.png)
+![screenshot](assets/git/5.png)
 
 ### Plant Disease Detect By AI Section
-![screenshot](assets/github/6.png)
+![screenshot](assets/git/6.png)
 Translate EN to BN by Google Translator:
-![screenshot](assets/github/7.png)
+![screenshot](assets/git/7.png)
 
 ### Plant Genus Detect By AI Section
-![screenshot](assets/github/8.png)
+![screenshot](assets/git/8.png)
 Translate EN to BN by Google Translator:
-![screenshot](assets/github/9.png)
+![screenshot](assets/git/9.png)
 
 ### My Plants Section
-![screenshot](assets/github/10.png)
+![screenshot](assets/git/10.png)
 
 ### My Account Section (Basic & Pro Version)
-![screenshot](assets/github/11.png)
+![screenshot](assets/git/11.png)
 
 ### Upgrade Plan Section (Basic & Pro)
-![screenshot](assets/github/12.png)
+![screenshot](assets/git/12.png)
 
 ### Payment Method (Currently Active **Bkash**)
-![screenshot](assets/github/13.png)
+![screenshot](assets/git/13.png)
 After a successful payment:
-![screenshot](assets/github/14.png)
+![screenshot](assets/git/14.png)
 
 ### Expert Chat Section (Pro Features)
-![screenshot](assets/github/15.png)
+![screenshot](assets/git/15.png)
 
 ## App Features
 
