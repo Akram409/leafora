@@ -16,7 +16,7 @@ A cross-platform Flutter application that leverages AI to assist users in identi
 
 ## Leafora App Demo
 
-### Onboard Section
+### Onboard Section 
 ![screenshot](assets/github/1.png)
 
 ### Login & Signup Section
